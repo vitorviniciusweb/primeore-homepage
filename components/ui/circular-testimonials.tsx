@@ -135,7 +135,8 @@ export function CircularTestimonials({
                   alt={t.name}
                   width={280}
                   height={380}
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: "15% center" }}
                   priority={i === 0}
                 />
               </button>
