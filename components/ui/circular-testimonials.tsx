@@ -103,7 +103,7 @@ export function CircularTestimonials({
 
         {/* Left: image stack with 3D perspective */}
         <div
-          className="relative h-[20rem] md:h-[32rem] flex items-center justify-center overflow-hidden"
+          className="relative h-[28rem] md:h-[32rem] flex items-center justify-center overflow-hidden"
           style={{ perspective: "1000px" }}
         >
           {testimonials.map((t, i) => {
@@ -135,8 +135,7 @@ export function CircularTestimonials({
                   alt={t.name}
                   width={280}
                   height={380}
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: "15% center" }}
+                  className="w-full h-full object-cover object-top"
                   priority={i === 0}
                 />
               </button>
