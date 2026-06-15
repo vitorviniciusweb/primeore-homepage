@@ -57,9 +57,9 @@ export function GlassProjectCard({
         <Image
           src={logo}
           alt={title}
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, 33vw"
+          width={600}
+          height={338}
+          className="w-full h-full object-cover"
         />
 
         {/* Readability gradient at base of image */}

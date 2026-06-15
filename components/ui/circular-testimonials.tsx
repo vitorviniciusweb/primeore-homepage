@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Types ─────────────────────────────────────────────────────────────────────
 interface Testimonial {
   src: string;
   name: string;
@@ -36,7 +36,7 @@ export interface CircularTestimonialsProps {
   style?: React.CSSProperties;
 }
 
-// â”€â”€â”€ Image position â€” center large, sides smaller with rotateY depth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Image position: center large, sides smaller with rotateY depth ────────────
 function getImageStyle(
   index: number,
   activeIndex: number,
@@ -58,7 +58,6 @@ function getImageStyle(
     };
   }
 
-  // Lateral: shifted, scaled down, rotated for depth illusion
   return {
     zIndex: 2,
     transform: `translateX(${dir * 155}px) scale(0.85) rotateY(${dir * -15}deg)`,
@@ -67,7 +66,7 @@ function getImageStyle(
   };
 }
 
-// â”€â”€â”€ Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// ─── Component ─────────────────────────────────────────────────────────────────
 export function CircularTestimonials({
   testimonials,
   autoplay = false,
@@ -102,19 +101,23 @@ export function CircularTestimonials({
     <div className="w-full" style={style}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-32 items-center">
 
-        {/* â”€â”€ Left: image stack with 3D perspective â”€â”€ */}
+        {/* Left: image stack with 3D perspective */}
         <div
-          className="relative h-[32rem] flex items-center justify-center"
+          className="relative h-72 md:h-[32rem] flex items-center justify-center overflow-hidden"
           style={{ perspective: "1000px" }}
         >
           {testimonials.map((t, i) => {
+            const raw = ((i - active) % total + total) % total;
+            const pos = raw > Math.floor(total / 2) ? raw - total : raw;
+            const absPos = Math.abs(pos);
             const imgStyle = getImageStyle(i, active, total);
             if (imgStyle.display === "none") return null;
             return (
               <button
                 key={t.src}
                 onClick={() => setActive(i)}
-                className="absolute focus:outline-none"
+                // Side images hidden on mobile to prevent overflow on narrow screens
+                className={`absolute focus:outline-none${absPos > 0 ? " hidden md:block" : ""}`}
                 style={{
                   ...imgStyle,
                   width: "280px",
@@ -130,9 +133,9 @@ export function CircularTestimonials({
                 <Image
                   src={t.src}
                   alt={t.name}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  sizes="280px"
+                  width={280}
+                  height={380}
+                  className="w-full h-full object-cover"
                   priority={i === 0}
                 />
               </button>
@@ -140,10 +143,10 @@ export function CircularTestimonials({
           })}
         </div>
 
-        {/* â”€â”€ Right: animated text + controls â”€â”€ */}
+        {/* Right: animated text + controls */}
         <div className="flex flex-col">
 
-          {/* Quote â€” word-by-word blur/fade on key change */}
+          {/* Quote: word-by-word blur/fade triggered by key change */}
           <div key={active} className="mb-6 leading-relaxed min-h-[160px]">
             <p
               style={{
@@ -165,7 +168,7 @@ export function CircularTestimonials({
             </p>
           </div>
 
-          {/* Name + designation â€” fade on slide change */}
+          {/* Name + designation: fade on slide change */}
           <AnimatePresence mode="wait">
             <motion.div
               key={`meta-${active}`}
@@ -234,7 +237,7 @@ export function CircularTestimonials({
                 color: colors.arrowForeground ?? "var(--foreground)",
               }}
               className="w-10 h-10 rounded-full flex items-center justify-center transition-opacity hover:opacity-70 focus:outline-none"
-              aria-label="PrÃ³ximo"
+              aria-label="Proximo"
             >
               <FaArrowRight size={13} />
             </button>
@@ -244,4 +247,3 @@ export function CircularTestimonials({
     </div>
   );
 }
-

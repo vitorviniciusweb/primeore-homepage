@@ -57,7 +57,7 @@ export function PricingCard({
       </p>
 
       {/* Price */}
-      <p className="font-display text-4xl font-bold text-foreground leading-none mb-2">
+      <p className="font-display text-3xl md:text-4xl font-bold text-foreground leading-none mb-2">
         {price}
       </p>
 

@@ -8,7 +8,7 @@ export default function WhatsappFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Falar no WhatsApp"
-      className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-accent rounded-full flex items-center justify-center shadow-lg hover:scale-110 hover:bg-accent/90 transition-all duration-200"
+      className="fixed bottom-6 right-6 z-[9999] w-14 h-14 bg-accent rounded-full flex items-center justify-center shadow-lg hover:scale-110 hover:bg-accent/90 transition-all duration-200"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
