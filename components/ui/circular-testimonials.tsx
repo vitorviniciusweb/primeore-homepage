@@ -99,11 +99,11 @@ export function CircularTestimonials({
 
   return (
     <div className="w-full" style={style}>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-32 items-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-32 items-center">
 
         {/* Left: image stack with 3D perspective */}
         <div
-          className="relative h-72 md:h-[32rem] flex items-center justify-center overflow-hidden"
+          className="relative h-[20rem] md:h-[32rem] flex items-center justify-center overflow-hidden"
           style={{ perspective: "1000px" }}
         >
           {testimonials.map((t, i) => {
