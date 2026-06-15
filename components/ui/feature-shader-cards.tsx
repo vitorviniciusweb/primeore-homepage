@@ -93,7 +93,7 @@ const features: { Icon: LucideIcon; title: string; description: string }[] = [
     Icon: Search,
     title: "Cliente pesquisa, não encontra",
     description:
-      "Sem site, sua empresa não aparece no Google quando alguém busca pelo que você oferece em Santos.",
+      "Sem site, sua empresa não aparece no Google quando alguém busca pelo que você oferece na sua cidade.",
   },
   {
     Icon: Users,

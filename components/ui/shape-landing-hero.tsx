@@ -193,9 +193,9 @@ export default function HeroGeometric({
           animate={textAnimate}
           className="text-base sm:text-lg text-foreground-dim max-w-xl mx-auto mb-10 leading-relaxed"
         >
-          Criamos sites institucionais profissionais para empresários de Santos
-          que ainda não têm presença online — ou têm uma que não representa o
-          que o negócio realmente é.
+          Criamos sites institucionais profissionais para empresários que ainda
+          não têm presença online — ou têm uma que não representa o que o
+          negócio realmente é.
         </motion.p>
 
         {/* CTAs */}

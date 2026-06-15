@@ -21,7 +21,7 @@ const steps = [
     step: "Passo 4",
     title: "Site no ar",
     description:
-      "Publicamos o site com domínio e hospedagem configurados, pronto para receber seus clientes.",
+      "Publicamos o site com domínio próprio, registrado em seu nome, pronto para receber seus clientes.",
   },
 ];
 

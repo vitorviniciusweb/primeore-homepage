@@ -13,6 +13,7 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-steel: var(--steel);
+  --color-gold: var(--gold);
 
   /* shadcn core */
   --color-card: var(--card);
@@ -39,6 +40,14 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* CTA glow shadow */
+  --shadow-glow:
+    0 -16px 128px 0 hsl(var(--brand-foreground) / 0.5) inset,
+    0 -16px 32px 0 hsl(var(--brand) / 0.5) inset;
+
+  /* Max-width token */
+  --max-w-container: 80rem;
 }
 
 :root {
@@ -49,6 +58,10 @@
   --accent: #ff6b35;
   --accent-foreground: #ffffff;
   --steel: #3d5a80;
+  --gold: hsl(35, 60%, 55%);
+  /* Glow effect channels (H S L, no wrapper) */
+  --brand: 21 100% 60%;
+  --brand-foreground: 28 95% 75%;
 
   --card: #1e222b;
   --card-foreground: #f2f0eb;
@@ -79,8 +92,45 @@
   }
 }
 
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(1.25rem); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 @layer utilities {
   .font-display {
     font-family: var(--font-display), Georgia, serif;
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 0.65s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    opacity: 0;
+    animation: fade-in 0.5s ease-out 0.2s forwards;
+  }
+
+  .animate-scale-in {
+    opacity: 0;
+    animation: scale-in 0.45s ease-out 0.35s forwards;
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .max-w-container {
+    max-width: var(--max-w-container);
   }
 }

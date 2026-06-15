@@ -5,7 +5,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-border backdrop-blur-md bg-background/80">
       <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="/" className="font-display text-xl font-bold text-foreground tracking-tight">
+        <a href="/" className="font-display text-xl font-bold text-foreground tracking-tight outline-none focus-visible:underline focus-visible:decoration-accent">
           prime<span className="text-accent">ore</span>
         </a>
         <a

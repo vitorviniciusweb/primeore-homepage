@@ -1,40 +1,36 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
+import { GlassProjectCard } from "@/components/ui/glass-project-card";
 
 const projects = [
   {
-    name: "Editora HNG",
-    url: "https://www.editorahng.com.br/",
-    tag: "Editora · Institucional",
+    title: "Editora HNG",
     description:
       "Editora especializada em livros que eternizam trajetórias empresariais.",
-    from: "#3d5a80",
-    to: "#16191f",
+    badges: ["Editora", "Institucional"] as [string, string],
+    logo: "/portfolio/editora-hng.png",
+    href: "https://www.editorahng.com.br/",
+    accentColor: "steel" as const,
   },
   {
-    name: "Cambuí Exclusividade",
-    url: "https://cambuiexclusividade.com.br/",
-    tag: "Imóveis de alto padrão",
+    title: "Cambuí Exclusividade",
     description:
       "Landing page de lançamento imobiliário em Campinas, foco em geração de leads.",
-    from: "#1a3550",
-    to: "#16191f",
+    badges: ["Imóveis de Luxo", "Campinas/SP"] as [string, string],
+    logo: "/portfolio/cambui-exclusividade.png",
+    href: "https://cambuiexclusividade.com.br/",
+    accentColor: "accent" as const,
   },
   {
-    name: "Bastidores do Sucesso",
-    url: "https://www.silviasimone.com.br/",
-    tag: "Podcast · Santos/SP",
+    title: "Bastidores do Sucesso",
     description:
       "Site para podcast que entrevista empresários da Baixada Santista.",
-    from: "#2a1a3a",
-    to: "#16191f",
+    badges: ["Podcast", "Santos/SP"] as [string, string],
+    logo: "/portfolio/bastidores-sucesso.png",
+    href: "https://www.silviasimone.com.br/",
+    accentColor: "gold" as const,
   },
 ];
 
 export default function Portfolio() {
-  const shouldReduce = useReducedMotion();
-
   return (
     <section id="portfolio" className="bg-background py-24 px-6">
       <div className="max-w-5xl mx-auto">
@@ -49,41 +45,7 @@ export default function Portfolio() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {projects.map((p, i) => (
-            <motion.a
-              key={p.name}
-              href={p.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: shouldReduce ? 0 : 32 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{
-                duration: 0.55,
-                delay: i * 0.1,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              whileHover={shouldReduce ? {} : { y: -6 }}
-              className="group block rounded-2xl overflow-hidden border border-border hover:border-accent transition-colors duration-300"
-            >
-              <div
-                className="h-44"
-                style={{
-                  background: `linear-gradient(135deg, ${p.from}, ${p.to})`,
-                }}
-                aria-hidden
-              />
-              <div className="p-6 bg-background-soft">
-                <span className="text-xs text-foreground-dim tracking-wide uppercase block mb-2">
-                  {p.tag}
-                </span>
-                <h3 className="font-display text-xl font-bold text-foreground mb-2">
-                  {p.name}
-                </h3>
-                <p className="text-foreground-dim text-sm leading-relaxed">
-                  {p.description}
-                </p>
-              </div>
-            </motion.a>
+            <GlassProjectCard key={p.title} {...p} index={i} />
           ))}
         </div>
       </div>

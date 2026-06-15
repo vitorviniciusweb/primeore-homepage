@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "Primeore — Sites institucionais para empresas de Santos/SP",
   description:
     "Sites profissionais para pequenos empresários da Baixada Santista. Design sob medida, entrega rápida.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
