@@ -1,4 +1,16 @@
+"use client";
+
 import { cn } from "@/lib/utils";
+
+const pushWaClick = () => {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    (window as any).dataLayer.push({
+      event: "whatsapp_click",
+      event_category: "Lead",
+      event_label: "WhatsApp Primeore",
+    });
+  }
+};
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 interface CTAAction {
@@ -65,6 +77,7 @@ export function CTASection({
           href={action.href}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={pushWaClick}
           className={cn(
             "inline-flex items-center gap-2 px-9 py-4 rounded-full font-semibold text-base transition-colors animate-scale-in",
             action.variant === "outline"

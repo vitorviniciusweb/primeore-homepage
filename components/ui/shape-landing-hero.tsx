@@ -1,6 +1,16 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
+
+const pushWaClick = () => {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    (window as any).dataLayer.push({
+      event: "whatsapp_click",
+      event_category: "Lead",
+      event_label: "WhatsApp Primeore",
+    });
+  }
+};
 import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -210,6 +220,7 @@ export default function HeroGeometric({
             href={WA_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={pushWaClick}
             className="inline-flex items-center gap-2 px-7 py-3.5 bg-accent text-white font-semibold rounded-full hover:bg-accent/90 transition-colors"
           >
             Quero meu site <ArrowUpRight className="h-4 w-4" />

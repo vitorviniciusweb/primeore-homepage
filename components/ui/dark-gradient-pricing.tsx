@@ -1,4 +1,16 @@
+"use client";
+
 import { Check, X } from "lucide-react";
+
+const pushWaClick = () => {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    (window as any).dataLayer.push({
+      event: "whatsapp_click",
+      event_category: "Lead",
+      event_label: "WhatsApp Primeore",
+    });
+  }
+};
 import { cn } from "@/lib/utils";
 
 export interface Benefit {
@@ -106,6 +118,7 @@ export function PricingCard({
         href={ctaHref}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={pushWaClick}
         className={cn(
           "block w-full text-center px-6 py-3 rounded-full font-semibold text-sm transition-colors",
           ctaVariant === "default"

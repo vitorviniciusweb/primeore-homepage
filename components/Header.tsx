@@ -1,3 +1,15 @@
+"use client";
+
+const pushWaClick = () => {
+  if (typeof window !== "undefined" && (window as any).dataLayer) {
+    (window as any).dataLayer.push({
+      event: "whatsapp_click",
+      event_category: "Lead",
+      event_label: "WhatsApp Primeore",
+    });
+  }
+};
+
 const WA_URL =
   "https://wa.me/5513978109003?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Primeore%20e%20gostaria%20de%20um%20or%C3%A7amento.";
 
@@ -12,6 +24,7 @@ export default function Header() {
           href={WA_URL}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={pushWaClick}
           className="inline-flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 text-xs md:px-5 md:py-2 md:text-sm bg-accent text-white font-semibold rounded-full hover:bg-accent/90 transition-colors"
         >
           Falar no WhatsApp
