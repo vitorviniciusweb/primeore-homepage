@@ -45,7 +45,11 @@ export const metadata: Metadata = {
     images: ["https://primeore.com.br/og-image.png"],
   },
   icons: {
-    icon: "/favicon.svg",
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32", type: "image/x-icon" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
   },
   other: {
     "facebook-domain-verification": "p4pr7lx909fuozwhrxckw86x78snrg",
