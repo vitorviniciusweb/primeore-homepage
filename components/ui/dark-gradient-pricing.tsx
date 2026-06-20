@@ -110,7 +110,7 @@ export function PricingCard({
 
       {/* Optional note */}
       {note && (
-        <p className="text-xs text-foreground-dim mb-5 leading-relaxed">{note}</p>
+        <p className="text-xs text-foreground-dim mb-5 leading-relaxed italic">{note}</p>
       )}
 
       {/* CTA */}
