@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
 import Portfolio from "@/components/Portfolio";
+import Testimonial from "@/components/Testimonial";
 import Offer from "@/components/Offer";
 import Process from "@/components/Process";
 import About from "@/components/About";
@@ -17,6 +18,7 @@ export default function Home() {
         <Hero />
         <Problem />
         <Portfolio />
+        <Testimonial />
         <Offer />
         <Process />
         <About />
