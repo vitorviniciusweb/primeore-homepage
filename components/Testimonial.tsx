@@ -50,20 +50,16 @@ export default function Testimonial() {
             </div>
           </div>
 
-          {/* Vídeo */}
+          {/* Vídeo — embed YouTube */}
           <div className="relative w-full bg-black" style={{ aspectRatio: "16/9" }}>
-            <video
-              controls
-              preload="metadata"
-              className="w-full h-full object-cover"
-              poster=""
-            >
-              <source
-                src="/depoimentos/depoimento-renata-baldo-editora-hng-primeore.mp4"
-                type="video/mp4"
-              />
-              Seu navegador não suporta vídeo HTML5.
-            </video>
+            <iframe
+              src="https://www.youtube.com/embed/tK7G44xh5v8?rel=0&modestbranding=1&color=white"
+              title="Depoimento Renata Baldo — Editora HNG · Primeore"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="absolute inset-0 w-full h-full"
+              loading="lazy"
+            />
           </div>
 
           {/* Rodapé sutil */}
