@@ -39,3 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# media files (too large for GitHub — host externally)
+public/depoimentos/*.mp4
+public/depoimentos/*.mov
+public/depoimentos/*.webm
