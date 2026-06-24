@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { DragDropContext, type DropResult } from '@hello-pangea/dnd'
-import { Plus, LogOut, Cloud, CloudOff } from 'lucide-react'
+import { Plus, LogOut, Cloud, CloudOff, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import type { Contact, Temperature } from './_types'
 import { COLUMNS, INITIAL_CONTACTS } from './_data'
 import { KanbanColumn } from './_components/KanbanColumn'
@@ -199,6 +200,17 @@ export default function AdminPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link href="/admin/contratos">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="gap-1.5 text-xs"
+              style={{ color: '#a8adb8' }}
+            >
+              <FileText size={13} />
+              Contratos
+            </Button>
+          </Link>
           <Button
             size="sm"
             onClick={openNew}
