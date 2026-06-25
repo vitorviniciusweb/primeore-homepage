@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { Dialog } from '@base-ui/react/dialog'
-import { X, Trash2, ChevronRight, ChevronDown, Plus } from 'lucide-react'
+import { X, Trash2, ChevronRight, ChevronDown, Plus, Check, Users, Camera, Video, Briefcase, Music2, Globe } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import type { Contact, Collaborator, Temperature } from '../_types'
+import type { Contact, Collaborator, Temperature, SocialMedia } from '../_types'
 import { COLUMNS } from '../_data'
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 type FormState = {
   name: string
   company: string
-  service: string
+  services: string[]
   channel: string
   lastContact: string
   notes: string
@@ -38,11 +38,37 @@ type CollabDraft = {
   email: string
 }
 
+type CustomSocial = {
+  id: string
+  platform: string
+  url: string
+}
+
+const SERVICE_OPTIONS = [
+  'Site Institucional',
+  'Site Ecommerce',
+  'Site Landing Page',
+  'Tráfego Pago',
+  'Disparo WhatsApp',
+  'Desenvolvimento de Sistema',
+  'Desenvolvimento de Projeto',
+]
+
+const FIXED_PLATFORMS = [
+  { id: 'facebook',  label: 'Facebook',   Icon: Users,     placeholder: 'facebook.com/suapagina' },
+  { id: 'instagram', label: 'Instagram',  Icon: Camera,    placeholder: 'instagram.com/seuperfil' },
+  { id: 'youtube',   label: 'YouTube',    Icon: Video,     placeholder: 'youtube.com/@seucanal' },
+  { id: 'linkedin',  label: 'LinkedIn',   Icon: Briefcase, placeholder: 'linkedin.com/in/seuperfil' },
+  { id: 'spotify',   label: 'Spotify',    Icon: Music2,    placeholder: 'open.spotify.com/...' },
+]
+
+const FIXED_PLATFORM_IDS = new Set<string>(FIXED_PLATFORMS.map(p => p.id))
+
 function emptyForm(): FormState {
   return {
     name: '',
     company: '',
-    service: '',
+    services: [],
     channel: '',
     lastContact: new Date().toISOString().split('T')[0],
     notes: '',
@@ -110,6 +136,35 @@ function Field({
   )
 }
 
+function CheckboxItem({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string
+  checked: boolean
+  onChange: () => void
+}) {
+  return (
+    <button
+      onClick={onChange}
+      className="flex items-center gap-2 text-xs text-left py-0.5"
+      style={{ color: checked ? '#F2F0EB' : '#a8adb8' }}
+    >
+      <span
+        className="w-4 h-4 rounded shrink-0 flex items-center justify-center border transition-colors"
+        style={{
+          backgroundColor: checked ? '#FF6B35' : '#1e2229',
+          borderColor: checked ? '#FF6B35' : '#3D5A80',
+        }}
+      >
+        {checked && <Check size={9} strokeWidth={3} style={{ color: '#fff' }} />}
+      </span>
+      {label}
+    </button>
+  )
+}
+
 export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props) {
   const [form, setForm] = useState<FormState>(emptyForm())
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
@@ -117,13 +172,18 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
   const [collabs, setCollabs] = useState<CollabDraft[]>([])
   const [collabOpen, setCollabOpen] = useState(false)
 
+  // Social media state
+  const [activePlatforms, setActivePlatforms] = useState<Set<string>>(new Set())
+  const [platformUrls, setPlatformUrls] = useState<Record<string, string>>({})
+  const [customSocials, setCustomSocials] = useState<CustomSocial[]>([])
+
   useEffect(() => {
     if (!open) return
     if (initial) {
       setForm({
         name: initial.name,
         company: initial.company,
-        service: initial.service,
+        services: initial.services ?? [],
         channel: initial.channel,
         lastContact: initial.lastContact
           ? initial.lastContact.split('T')[0]
@@ -144,9 +204,29 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
           email: c.email ?? '',
         })),
       )
+
+      // Hydrate social media
+      const sm = initial.socialMedia ?? []
+      const newActive = new Set<string>()
+      const newUrls: Record<string, string> = {}
+      const newCustom: CustomSocial[] = []
+      for (const entry of sm) {
+        if (FIXED_PLATFORM_IDS.has(entry.platform)) {
+          newActive.add(entry.platform)
+          newUrls[entry.platform] = entry.url
+        } else {
+          newCustom.push({ id: Math.random().toString(36).slice(2), platform: entry.platform, url: entry.url })
+        }
+      }
+      setActivePlatforms(newActive)
+      setPlatformUrls(newUrls)
+      setCustomSocials(newCustom.slice(0, 3))
     } else {
       setForm(emptyForm())
       setCollabs([])
+      setActivePlatforms(new Set())
+      setPlatformUrls({})
+      setCustomSocials([])
     }
     setErrors({})
     setConfirmDelete(false)
@@ -156,6 +236,29 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
   function set(field: keyof FormState, value: string) {
     setForm(f => ({ ...f, [field]: value }))
     if (errors[field]) setErrors(e => { const n = { ...e }; delete n[field]; return n })
+  }
+
+  function toggleService(svc: string) {
+    setForm(f => ({
+      ...f,
+      services: f.services.includes(svc)
+        ? f.services.filter(s => s !== svc)
+        : [...f.services, svc],
+    }))
+    if (errors.services) setErrors(e => { const n = { ...e }; delete n.services; return n })
+  }
+
+  function togglePlatform(id: string) {
+    setActivePlatforms(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+        setPlatformUrls(u => { const n = { ...u }; delete n[id]; return n })
+      } else {
+        next.add(id)
+      }
+      return next
+    })
   }
 
   function setCollab(id: string, field: keyof CollabDraft, value: string) {
@@ -177,14 +280,38 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
     setCollabs(prev => prev.filter(c => c.id !== id))
   }
 
+  function addCustomSocial() {
+    if (customSocials.length >= 3) return
+    setCustomSocials(prev => [...prev, { id: Math.random().toString(36).slice(2), platform: '', url: '' }])
+  }
+
+  function removeCustomSocial(id: string) {
+    setCustomSocials(prev => prev.filter(s => s.id !== id))
+  }
+
+  function updateCustomSocial(id: string, field: 'platform' | 'url', value: string) {
+    setCustomSocials(prev => prev.map(s => s.id === id ? { ...s, [field]: value } : s))
+  }
+
   function validate(): boolean {
     const e: Partial<Record<keyof FormState, string>> = {}
     if (!form.name.trim()) e.name = 'Campo obrigatório'
     if (!form.company.trim()) e.company = 'Campo obrigatório'
-    if (!form.service.trim()) e.service = 'Campo obrigatório'
+    if (form.services.length === 0) e.services = 'Selecione ao menos um serviço'
     if (!form.channel.trim()) e.channel = 'Campo obrigatório'
     setErrors(e)
     return Object.keys(e).length === 0
+  }
+
+  function buildSocialMedia(): SocialMedia[] | undefined {
+    const fixed = FIXED_PLATFORMS
+      .filter(p => activePlatforms.has(p.id) && (platformUrls[p.id] ?? '').trim())
+      .map(p => ({ platform: p.id, url: platformUrls[p.id].trim() }))
+    const custom = customSocials
+      .filter(s => s.platform.trim() && s.url.trim())
+      .map(s => ({ platform: s.platform.trim(), url: s.url.trim() }))
+    const all = [...fixed, ...custom]
+    return all.length > 0 ? all : undefined
   }
 
   function handleSave() {
@@ -204,7 +331,7 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
       id: initial?.id ?? Math.random().toString(36).slice(2) + Date.now().toString(36),
       name: form.name.trim(),
       company: form.company.trim(),
-      service: form.service.trim(),
+      services: form.services,
       channel: form.channel.trim(),
       lastContact: form.lastContact
         ? new Date(form.lastContact + 'T00:00:00').toISOString()
@@ -217,6 +344,7 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
       collaborators: saved.length > 0 ? saved : undefined,
       lostReason: form.status === 'Perdido' ? form.lostReason.trim() : undefined,
       createdAt: initial?.createdAt ?? now,
+      socialMedia: buildSocialMedia(),
     })
     onClose()
   }
@@ -289,23 +417,28 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
               </Field>
             </div>
 
-            {/* Serviço + Canal */}
-            <div className="grid grid-cols-2 gap-3">
-              <Field label="Serviço de interesse *" error={errors.service}>
-                <Input
-                  value={form.service}
-                  onChange={e => set('service', e.target.value)}
-                  placeholder="Ex: Site institucional"
-                />
-              </Field>
-              <Field label="Canal de origem *" error={errors.channel}>
-                <Input
-                  value={form.channel}
-                  onChange={e => set('channel', e.target.value)}
-                  placeholder="Ex: Indicação"
-                />
-              </Field>
-            </div>
+            {/* Serviços de interesse (checkboxes) */}
+            <Field label="Serviços de interesse *" error={errors.services}>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-0.5 p-3 rounded-lg" style={{ backgroundColor: 'rgba(242,240,235,0.04)', border: '1px solid rgba(242,240,235,0.08)' }}>
+                {SERVICE_OPTIONS.map(svc => (
+                  <CheckboxItem
+                    key={svc}
+                    label={svc}
+                    checked={form.services.includes(svc)}
+                    onChange={() => toggleService(svc)}
+                  />
+                ))}
+              </div>
+            </Field>
+
+            {/* Canal */}
+            <Field label="Canal de origem *" error={errors.channel}>
+              <Input
+                value={form.channel}
+                onChange={e => set('channel', e.target.value)}
+                placeholder="Ex: Indicação"
+              />
+            </Field>
 
             {/* Status + Temperatura */}
             <div className="grid grid-cols-2 gap-3">
@@ -369,6 +502,90 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
                   placeholder="email@empresa.com"
                 />
               </Field>
+            </div>
+
+            {/* ── Redes Sociais ── */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#6b7280' }}>
+                Redes Sociais
+              </p>
+
+              {/* Fixed platforms */}
+              <div className="space-y-2">
+                {FIXED_PLATFORMS.map(({ id, label, Icon, placeholder }) => {
+                  const isActive = activePlatforms.has(id)
+                  return (
+                    <div key={id}>
+                      <button
+                        onClick={() => togglePlatform(id)}
+                        className="flex items-center gap-2 w-full text-left py-0.5"
+                      >
+                        <span
+                          className="w-4 h-4 rounded shrink-0 flex items-center justify-center border transition-colors"
+                          style={{
+                            backgroundColor: isActive ? '#FF6B35' : '#1e2229',
+                            borderColor: isActive ? '#FF6B35' : '#3D5A80',
+                          }}
+                        >
+                          {isActive && <Check size={9} strokeWidth={3} style={{ color: '#fff' }} />}
+                        </span>
+                        <Icon size={13} style={{ color: isActive ? '#FF6B35' : '#6b7280', flexShrink: 0 }} />
+                        <span className="text-xs" style={{ color: isActive ? '#F2F0EB' : '#a8adb8' }}>
+                          {label}
+                        </span>
+                      </button>
+                      {isActive && (
+                        <div className="ml-6 mt-1.5">
+                          <Input
+                            value={platformUrls[id] ?? ''}
+                            onChange={e => setPlatformUrls(prev => ({ ...prev, [id]: e.target.value }))}
+                            placeholder={placeholder}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Custom socials */}
+              {customSocials.length > 0 && (
+                <div className="space-y-2 pt-1">
+                  {customSocials.map(s => (
+                    <div key={s.id} className="flex items-center gap-2">
+                      <Input
+                        value={s.platform}
+                        onChange={e => updateCustomSocial(s.id, 'platform', e.target.value)}
+                        placeholder="Nome da rede"
+                        className="flex-1"
+                      />
+                      <Input
+                        value={s.url}
+                        onChange={e => updateCustomSocial(s.id, 'url', e.target.value)}
+                        placeholder="URL do perfil"
+                        className="flex-1"
+                      />
+                      <button
+                        onClick={() => removeCustomSocial(s.id)}
+                        className="p-1.5 rounded hover:bg-red-500/20 transition-colors shrink-0"
+                      >
+                        <X size={13} style={{ color: '#a8adb8' }} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {customSocials.length < 3 && (
+                <button
+                  onClick={addCustomSocial}
+                  className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-colors hover:bg-white/10"
+                  style={{ border: '1px dashed rgba(242,240,235,0.2)', color: '#a8adb8' }}
+                >
+                  <Plus size={12} />
+                  Adicionar outra rede
+                </button>
+              )}
             </div>
 
             {divider}

@@ -11,6 +11,7 @@ import { COLUMNS, INITIAL_CONTACTS } from './_data'
 import { KanbanColumn } from './_components/KanbanColumn'
 import { ContactModal } from './_components/ContactModal'
 import { LostModal } from './_components/LostModal'
+import { BriefingModal } from './_components/BriefingModal'
 
 const STORAGE_KEY = 'primeore_contacts'
 const TEMP_ORDER: Record<Temperature, number> = { quente: 0, morno: 1, frio: 2 }
@@ -24,7 +25,14 @@ function sortByTemp(list: Contact[]): Contact[] {
 }
 
 function backfill(list: Contact[]): Contact[] {
-  return list.map(c => ({ ...c, temperature: (c.temperature ?? 'morno') as Temperature }))
+  return list.map(c => {
+    const raw = c as Contact & { service?: string }
+    return {
+      ...c,
+      temperature: (c.temperature ?? 'morno') as Temperature,
+      services: c.services ?? (raw.service ? [raw.service] : []),
+    }
+  })
 }
 
 function loadFromStorage(): Contact[] {
@@ -52,6 +60,11 @@ export default function AdminPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [lostPending, setLostPending] = useState<LostPending | null>(null)
+
+  const [briefingStatus, setBriefingStatus] = useState<Record<string, boolean>>({})
+  const [briefingContact, setBriefingContact] = useState<Contact | null>(null)
+  const [toast, setToast] = useState<string | null>(null)
+  const briefingFetched = useRef(false)
 
   // When true, the next run of the persist effect skips the Redis POST
   // (used after we just loaded data FROM Redis — no need to echo it back)
@@ -87,6 +100,29 @@ export default function AdminPage() {
 
     load()
   }, [])
+
+  // ── Fetch briefing status for "Fechado" contacts (once after hydration) ──
+  useEffect(() => {
+    if (!hydrated || briefingFetched.current) return
+    briefingFetched.current = true
+
+    const fechados = contacts.filter(c => c.status === 'Fechado')
+    if (fechados.length === 0) return
+
+    Promise.all(
+      fechados.map(c =>
+        fetch(`/api/briefing/${c.id}`)
+          .then(r => r.json())
+          .then(data => ({ id: c.id, filled: data !== null }))
+          .catch(() => ({ id: c.id, filled: false })),
+      ),
+    ).then(results => {
+      const next: Record<string, boolean> = {}
+      results.forEach(r => { next[r.id] = r.filled })
+      setBriefingStatus(next)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated])
 
   // ── Persist on every contacts change ──
   useEffect(() => {
@@ -180,6 +216,17 @@ export default function AdminPage() {
     setEditingContact(null)
   }
 
+  function handleCopyBriefingLink(c: Contact) {
+    const url = `https://primeore.com.br/briefing/${c.id}`
+    navigator.clipboard.writeText(url).catch(() => {})
+    setToast('Link copiado!')
+    setTimeout(() => setToast(null), 2000)
+  }
+
+  function handleViewBriefing(c: Contact) {
+    setBriefingContact(c)
+  }
+
   if (!hydrated) return null
 
   return (
@@ -247,6 +294,9 @@ export default function AdminPage() {
                 contacts={sortByTemp(contacts.filter(c => c.status === col.id))}
                 onEdit={openEdit}
                 onDelete={handleDelete}
+                briefingStatus={briefingStatus}
+                onViewBriefing={handleViewBriefing}
+                onCopyBriefingLink={handleCopyBriefingLink}
               />
             ))}
           </div>
@@ -266,6 +316,23 @@ export default function AdminPage() {
         onConfirm={handleLostConfirm}
         onCancel={() => setLostPending(null)}
       />
+
+      <BriefingModal
+        open={!!briefingContact}
+        contactId={briefingContact?.id ?? ''}
+        contactName={briefingContact?.name ?? ''}
+        onClose={() => setBriefingContact(null)}
+      />
+
+      {/* Toast */}
+      {toast && (
+        <div
+          className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-lg text-sm font-medium shadow-lg pointer-events-none"
+          style={{ backgroundColor: '#22c55e', color: '#fff' }}
+        >
+          {toast}
+        </div>
+      )}
     </div>
   )
 }

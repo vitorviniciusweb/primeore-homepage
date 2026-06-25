@@ -22,17 +22,11 @@ const labelStyle: React.CSSProperties = {
   color: '#a8adb8',
   marginBottom: 4,
 }
-const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 13,
-  fontWeight: 600,
-  color: '#F2F0EB',
-  marginBottom: 12,
-}
 const sectionStyle: React.CSSProperties = {
   backgroundColor: 'rgba(255,255,255,0.03)',
   border: '1px solid rgba(242,240,235,0.07)',
   borderRadius: 12,
-  padding: '20px 20px',
+  padding: '16px',
   marginBottom: 16,
 }
 
@@ -257,11 +251,7 @@ export default function EditarContratoPage() {
         <span className="text-sm" style={{ color: '#a8adb8' }}>
           Contrato não encontrado.
         </span>
-        <Link
-          href="/admin/contratos"
-          className="text-sm"
-          style={{ color: '#FF6B35' }}
-        >
+        <Link href="/admin/contratos" className="text-sm" style={{ color: '#FF6B35' }}>
           ← Voltar
         </Link>
       </div>
@@ -274,7 +264,7 @@ export default function EditarContratoPage() {
     <div className="min-h-screen" style={{ backgroundColor: '#16191F' }}>
       {/* Header */}
       <header
-        className="flex items-center justify-between px-5 py-3"
+        className="flex items-center justify-between px-4 py-3 sm:px-5"
         style={{ borderBottom: '1px solid rgba(242,240,235,0.07)', backgroundColor: '#1a1d24' }}
       >
         <div className="flex items-center gap-3">
@@ -299,17 +289,21 @@ export default function EditarContratoPage() {
           style={{ backgroundColor: 'rgba(255,107,53,0.12)', color: '#FF6B35' }}
         >
           <FileDown size={13} />
-          {downloadingPDF ? 'Gerando...' : 'Download PDF'}
+          <span className="hidden sm:inline">
+            {downloadingPDF ? 'Gerando...' : 'Download PDF'}
+          </span>
         </button>
       </header>
 
       {/* Form */}
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main className="max-w-3xl mx-auto px-4 py-6 md:py-8">
 
         {/* Clientes */}
         <div style={sectionStyle}>
           <div className="flex items-center justify-between mb-4">
-            <p style={sectionTitleStyle}>Clientes</p>
+            <p className="text-xs font-semibold md:text-sm" style={{ color: '#F2F0EB', marginBottom: 0 }}>
+              Clientes
+            </p>
             <button
               onClick={() => setClientes(prev => [...prev, emptyCliente()])}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80"
@@ -324,7 +318,7 @@ export default function EditarContratoPage() {
             {clientes.map((cliente, idx) => (
               <div
                 key={cliente.id}
-                className="rounded-lg p-4"
+                className="rounded-lg p-3 md:p-4"
                 style={{ backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(242,240,235,0.06)' }}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -341,7 +335,9 @@ export default function EditarContratoPage() {
                     </button>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+
+                {/* 1 col on mobile, 2 cols on md+ */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label style={labelStyle}>Tipo</label>
                     <select
@@ -406,7 +402,9 @@ export default function EditarContratoPage() {
 
         {/* Projeto */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Projeto</p>
+          <p className="text-xs font-semibold md:text-sm mb-3" style={{ color: '#F2F0EB' }}>
+            Projeto
+          </p>
           <div>
             <label style={labelStyle}>Tipo de Projeto</label>
             <select
@@ -428,7 +426,9 @@ export default function EditarContratoPage() {
         {/* Seções */}
         <div style={sectionStyle}>
           <div className="flex items-center justify-between mb-4">
-            <p style={sectionTitleStyle}>Seções Incluídas</p>
+            <p className="text-xs font-semibold md:text-sm" style={{ color: '#F2F0EB', marginBottom: 0 }}>
+              Seções Incluídas
+            </p>
             <button
               onClick={() => setSecoes(prev => [...prev, emptySecao()])}
               className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-80"
@@ -447,7 +447,8 @@ export default function EditarContratoPage() {
                 >
                   {idx + 1}.
                 </span>
-                <div className="flex-1 grid grid-cols-2 gap-2">
+                {/* 1 col on mobile, 2 cols on md+ */}
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
                   <div>
                     <label style={labelStyle}>Nome da Seção *</label>
                     <input
@@ -485,10 +486,12 @@ export default function EditarContratoPage() {
           </div>
         </div>
 
-        {/* Valores */}
+        {/* Valores — 1 col on mobile, 3 cols on md+ */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Valores</p>
-          <div className="grid grid-cols-3 gap-4">
+          <p className="text-xs font-semibold md:text-sm mb-3" style={{ color: '#F2F0EB' }}>
+            Valores
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label style={labelStyle}>Valor Total (R$) *</label>
               <input
@@ -543,7 +546,9 @@ export default function EditarContratoPage() {
 
         {/* Data */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Data de Assinatura</p>
+          <p className="text-xs font-semibold md:text-sm mb-3" style={{ color: '#F2F0EB' }}>
+            Data de Assinatura
+          </p>
           <div className="max-w-xs">
             <input
               type="date"
@@ -555,10 +560,12 @@ export default function EditarContratoPage() {
           </div>
         </div>
 
-        {/* Extra fields — only in edit */}
+        {/* Links e Status — 1 col on mobile, 2 cols on md+ */}
         <div style={sectionStyle}>
-          <p style={sectionTitleStyle}>Links e Status</p>
-          <div className="grid grid-cols-2 gap-4 mb-4">
+          <p className="text-xs font-semibold md:text-sm mb-3" style={{ color: '#F2F0EB' }}>
+            Links e Status
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label style={labelStyle}>Link ClickSign</label>
               <input
@@ -582,7 +589,7 @@ export default function EditarContratoPage() {
               />
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label style={labelStyle}>Status do Contrato</label>
               <select
@@ -635,11 +642,11 @@ export default function EditarContratoPage() {
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex justify-end gap-3">
+        {/* Actions — stacked on mobile, row on sm+ */}
+        <div className="flex flex-col sm:flex-row sm:justify-end gap-3">
           <Link
             href="/admin/contratos"
-            className="rounded-lg px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-70"
+            className="rounded-lg px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-70 text-center"
             style={{ color: '#a8adb8' }}
           >
             Voltar
@@ -647,7 +654,7 @@ export default function EditarContratoPage() {
           <button
             onClick={handleSave}
             disabled={loading}
-            className="rounded-lg px-6 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="w-full sm:w-auto rounded-lg px-6 py-2.5 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-50"
             style={{ backgroundColor: '#FF6B35', color: '#fff' }}
           >
             {loading ? 'Salvando...' : 'Salvar Alterações'}

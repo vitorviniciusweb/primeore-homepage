@@ -1,12 +1,15 @@
 'use client'
 
-import { Pencil, Trash2, Phone, MessageCircle } from 'lucide-react'
+import { Pencil, Trash2, Phone, MessageCircle, ClipboardCopy, Eye, Users, Camera, Video, Briefcase, Music2, Globe } from 'lucide-react'
 import type { Contact, Temperature } from '../_types'
 
 type Props = {
   contact: Contact
   onEdit: () => void
   onDelete: () => void
+  briefingPreenchido?: boolean
+  onViewBriefing?: () => void
+  onCopyBriefingLink?: () => void
 }
 
 const TEMP_CONFIG: Record<
@@ -35,10 +38,30 @@ function phoneDigits(phone: string): string {
   return phone.replace(/\D/g, '')
 }
 
-export function ContactCard({ contact, onEdit, onDelete }: Props) {
+function SocialIcon({ platform }: { platform: string }) {
+  const size = 10
+  switch (platform.toLowerCase()) {
+    case 'facebook':  return <Users     size={size} />
+    case 'instagram': return <Camera    size={size} />
+    case 'youtube':   return <Video     size={size} />
+    case 'linkedin':  return <Briefcase size={size} />
+    case 'spotify':   return <Music2    size={size} />
+    default:          return <Globe     size={size} />
+  }
+}
+
+function servicesLabel(services: string[]): string {
+  if (services.length === 0) return ''
+  if (services.length <= 2) return services.join(', ')
+  return `${services[0]} e mais ${services.length - 1}`
+}
+
+export function ContactCard({ contact, onEdit, onDelete, briefingPreenchido, onViewBriefing, onCopyBriefingLink }: Props) {
   const temp = TEMP_CONFIG[contact.temperature ?? 'morno']
   const digits = contact.phone ? phoneDigits(contact.phone) : ''
   const hasPhone = digits.length >= 10
+  const filledSocials = (contact.socialMedia ?? []).filter(s => s.url)
+  const svcLabel = servicesLabel(contact.services ?? [])
 
   return (
     <div
@@ -82,6 +105,13 @@ export function ContactCard({ contact, onEdit, onDelete }: Props) {
         </span>
       </div>
 
+      {/* Row 2b: services */}
+      {svcLabel && (
+        <p className="text-[10px] leading-snug" style={{ color: '#a8adb8' }}>
+          {svcLabel}
+        </p>
+      )}
+
       {/* Row 3: channel badge + quick actions */}
       <div className="flex items-center justify-between gap-2">
         <span
@@ -113,6 +143,25 @@ export function ContactCard({ contact, onEdit, onDelete }: Props) {
         )}
       </div>
 
+      {/* Social media icons */}
+      {filledSocials.length > 0 && (
+        <div className="flex items-center gap-0.5 flex-wrap" onClick={e => e.stopPropagation()}>
+          {filledSocials.map((s, i) => (
+            <a
+              key={`${s.platform}-${i}`}
+              href={s.url.startsWith('http') ? s.url : `https://${s.url}`}
+              target="_blank"
+              rel="noreferrer"
+              title={s.platform}
+              className="p-1 rounded hover:bg-white/10 transition-colors"
+              style={{ color: '#6b7280' }}
+            >
+              <SocialIcon platform={s.platform} />
+            </a>
+          ))}
+        </div>
+      )}
+
       {/* Row 4: last contact date */}
       <p className="text-[10px]" style={{ color: '#6b7280' }}>
         Último contato: {formatDate(contact.lastContact)}
@@ -122,6 +171,51 @@ export function ContactCard({ contact, onEdit, onDelete }: Props) {
         <p className="text-[10px] italic line-clamp-2" style={{ color: '#9ca3af' }}>
           Motivo: {contact.lostReason}
         </p>
+      )}
+
+      {/* Briefing section — only for "Fechado" */}
+      {contact.status === 'Fechado' && (
+        <div
+          className="pt-2"
+          style={{ borderTop: '1px solid rgba(242,240,235,0.07)' }}
+          onClick={e => e.stopPropagation()}
+        >
+          {briefingPreenchido ? (
+            <div className="flex items-center justify-between gap-1.5">
+              <span
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold"
+                style={{ backgroundColor: 'rgba(34,197,94,0.12)', color: '#22c55e' }}
+              >
+                Briefing ✓
+              </span>
+              <button
+                onClick={onViewBriefing}
+                className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded transition-colors hover:bg-white/10"
+                style={{ color: '#a8adb8' }}
+              >
+                <Eye size={9} />
+                Ver
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-1.5">
+              <span
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-medium"
+                style={{ backgroundColor: 'rgba(107,114,128,0.15)', color: '#6b7280' }}
+              >
+                Briefing pendente
+              </span>
+              <button
+                onClick={onCopyBriefingLink}
+                className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded transition-colors hover:bg-white/10"
+                style={{ color: '#a8adb8' }}
+              >
+                <ClipboardCopy size={9} />
+                Copiar link
+              </button>
+            </div>
+          )}
+        </div>
       )}
     </div>
   )

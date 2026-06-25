@@ -12,9 +12,12 @@ type Props = {
   contacts: Contact[]
   onEdit: (c: Contact) => void
   onDelete: (id: string) => void
+  briefingStatus?: Record<string, boolean>
+  onViewBriefing?: (c: Contact) => void
+  onCopyBriefingLink?: (c: Contact) => void
 }
 
-export function KanbanColumn({ column, contacts, onEdit, onDelete }: Props) {
+export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatus, onViewBriefing, onCopyBriefingLink }: Props) {
   return (
     <div
       className="flex flex-col shrink-0 rounded-xl overflow-hidden"
@@ -95,6 +98,9 @@ export function KanbanColumn({ column, contacts, onEdit, onDelete }: Props) {
                       contact={c}
                       onEdit={() => onEdit(c)}
                       onDelete={() => onDelete(c.id)}
+                      briefingPreenchido={briefingStatus?.[c.id]}
+                      onViewBriefing={onViewBriefing ? () => onViewBriefing(c) : undefined}
+                      onCopyBriefingLink={onCopyBriefingLink ? () => onCopyBriefingLink(c) : undefined}
                     />
                   </div>
                 )}

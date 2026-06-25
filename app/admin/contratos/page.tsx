@@ -124,9 +124,9 @@ export default function ContratosPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#16191F' }}>
-      {/* Header */}
+      {/* Header — stacks on mobile, row on sm+ */}
       <header
-        className="flex items-center justify-between px-5 py-3 shrink-0"
+        className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 shrink-0"
         style={{
           borderBottom: '1px solid rgba(242,240,235,0.07)',
           backgroundColor: '#1a1d24',
@@ -149,7 +149,7 @@ export default function ContratosPage() {
 
         <button
           onClick={() => router.push('/admin/contratos/novo')}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-90"
+          className="flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-opacity hover:opacity-90 w-full sm:w-auto"
           style={{ backgroundColor: '#FF6B35', color: '#fff' }}
         >
           <Plus size={13} />
@@ -158,7 +158,7 @@ export default function ContratosPage() {
       </header>
 
       {/* Content */}
-      <main className="p-6">
+      <main className="p-4 md:p-6">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <span className="text-sm" style={{ color: '#a8adb8' }}>
@@ -180,141 +180,251 @@ export default function ContratosPage() {
             </button>
           </div>
         ) : (
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{ border: '1px solid rgba(242,240,235,0.07)' }}
-          >
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ backgroundColor: '#1a1d24', borderBottom: '1px solid rgba(242,240,235,0.07)' }}>
-                  {['Cliente(s)', 'Tipo de Projeto', 'Valor Total', 'Status Contrato', 'Status Pagamento', 'Ações'].map(h => (
-                    <th
-                      key={h}
-                      className="px-4 py-3 text-left text-xs font-medium"
-                      style={{ color: '#a8adb8' }}
-                    >
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <AnimatePresence initial={false}>
-                  {contratos.map((contrato, idx) => (
-                    <motion.tr
-                      key={contrato.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      style={{
-                        backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
-                        borderBottom: '1px solid rgba(242,240,235,0.05)',
-                      }}
-                    >
-                      {/* Cliente(s) */}
-                      <td className="px-4 py-3" style={{ color: '#F2F0EB' }}>
-                        <div className="flex flex-col gap-0.5">
-                          {contrato.clientes.map(c => (
-                            <span key={c.id} className="text-xs">
-                              {c.nome}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-
-                      {/* Tipo */}
-                      <td className="px-4 py-3 text-xs" style={{ color: '#F2F0EB' }}>
-                        {contrato.tipoProjeto}
-                      </td>
-
-                      {/* Valor */}
-                      <td className="px-4 py-3 text-xs font-medium" style={{ color: '#FF6B35' }}>
+          <>
+            {/* ── Mobile: card list (hidden on md+) ─────────────────────────── */}
+            <div className="md:hidden space-y-3">
+              <AnimatePresence initial={false}>
+                {contratos.map(contrato => (
+                  <motion.div
+                    key={contrato.id}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="rounded-xl p-4 space-y-3"
+                    style={{
+                      backgroundColor: '#1a1d24',
+                      border: '1px solid rgba(242,240,235,0.08)',
+                    }}
+                  >
+                    {/* Top row: names + value */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        {contrato.clientes.map(c => (
+                          <p
+                            key={c.id}
+                            className="font-semibold text-sm leading-snug"
+                            style={{ color: '#F2F0EB' }}
+                          >
+                            {c.nome}
+                          </p>
+                        ))}
+                        <p className="text-xs mt-0.5" style={{ color: '#a8adb8' }}>
+                          {contrato.tipoProjeto}
+                        </p>
+                      </div>
+                      <span
+                        className="text-sm font-semibold shrink-0"
+                        style={{ color: '#FF6B35' }}
+                      >
                         {formatCurrency(contrato.valorTotal)}
-                      </td>
+                      </span>
+                    </div>
 
-                      {/* Status contrato */}
-                      <td className="px-4 py-3">
-                        <StatusBadge status={contrato.status} />
-                      </td>
+                    {/* Badges */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <StatusBadge status={contrato.status} />
+                      <PagamentoBadge status={contrato.statusPagamento} />
+                    </div>
 
-                      {/* Status pagamento */}
-                      <td className="px-4 py-3">
-                        <PagamentoBadge status={contrato.statusPagamento} />
-                      </td>
+                    {/* Actions */}
+                    {deleteConfirmId === contrato.id ? (
+                      <div
+                        className="flex items-center gap-2 pt-1"
+                        style={{ borderTop: '1px solid rgba(242,240,235,0.06)' }}
+                      >
+                        <span className="text-xs flex-1" style={{ color: '#a8adb8' }}>
+                          Confirmar exclusão?
+                        </span>
+                        <button
+                          onClick={() => handleDelete(contrato.id)}
+                          className="text-xs font-medium px-3 py-1 rounded"
+                          style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}
+                        >
+                          Sim
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(null)}
+                          className="text-xs px-3 py-1 rounded"
+                          style={{ color: '#a8adb8' }}
+                        >
+                          Não
+                        </button>
+                      </div>
+                    ) : (
+                      <div
+                        className="flex items-center gap-1 pt-1"
+                        style={{ borderTop: '1px solid rgba(242,240,235,0.06)' }}
+                      >
+                        <button
+                          onClick={() => router.push(`/admin/contratos/${contrato.id}/editar`)}
+                          title="Editar"
+                          className="flex-1 flex items-center justify-center rounded-lg py-2 transition-colors hover:bg-white/10"
+                          style={{ color: '#a8adb8' }}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => setShareContrato(contrato)}
+                          title="Compartilhar"
+                          className="flex-1 flex items-center justify-center rounded-lg py-2 transition-colors hover:bg-white/10"
+                          style={{ color: '#3D5A80' }}
+                        >
+                          <Share2 size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDownloadPDF(contrato.id)}
+                          title="Download PDF"
+                          disabled={downloadingId === contrato.id}
+                          className="flex-1 flex items-center justify-center rounded-lg py-2 transition-colors hover:bg-white/10 disabled:opacity-40"
+                          style={{ color: '#FF6B35' }}
+                        >
+                          <FileDown size={16} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(contrato.id)}
+                          title="Excluir"
+                          className="flex-1 flex items-center justify-center rounded-lg py-2 transition-colors hover:bg-white/10"
+                          style={{ color: '#ef4444' }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
 
-                      {/* Ações */}
-                      <td className="px-4 py-3">
-                        {deleteConfirmId === contrato.id ? (
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs" style={{ color: '#a8adb8' }}>
-                              Confirmar?
-                            </span>
-                            <button
-                              onClick={() => handleDelete(contrato.id)}
-                              className="text-xs font-medium px-2 py-1 rounded"
-                              style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}
-                            >
-                              Sim
-                            </button>
-                            <button
-                              onClick={() => setDeleteConfirmId(null)}
-                              className="text-xs px-2 py-1 rounded"
-                              style={{ color: '#a8adb8' }}
-                            >
-                              Não
-                            </button>
+            {/* ── Desktop: table (hidden on mobile) ─────────────────────────── */}
+            <div
+              className="hidden md:block rounded-xl overflow-hidden"
+              style={{ border: '1px solid rgba(242,240,235,0.07)' }}
+            >
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ backgroundColor: '#1a1d24', borderBottom: '1px solid rgba(242,240,235,0.07)' }}>
+                    {['Cliente(s)', 'Tipo de Projeto', 'Valor Total', 'Status Contrato', 'Status Pagamento', 'Ações'].map(h => (
+                      <th
+                        key={h}
+                        className="px-4 py-3 text-left text-xs font-medium"
+                        style={{ color: '#a8adb8' }}
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <AnimatePresence initial={false}>
+                    {contratos.map((contrato, idx) => (
+                      <motion.tr
+                        key={contrato.id}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        style={{
+                          backgroundColor: idx % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)',
+                          borderBottom: '1px solid rgba(242,240,235,0.05)',
+                        }}
+                      >
+                        {/* Cliente(s) */}
+                        <td className="px-4 py-3" style={{ color: '#F2F0EB' }}>
+                          <div className="flex flex-col gap-0.5">
+                            {contrato.clientes.map(c => (
+                              <span key={c.id} className="text-xs">
+                                {c.nome}
+                              </span>
+                            ))}
                           </div>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            {/* Editar */}
-                            <button
-                              onClick={() => router.push(`/admin/contratos/${contrato.id}/editar`)}
-                              title="Editar"
-                              className="rounded-lg p-1.5 transition-colors hover:opacity-80"
-                              style={{ color: '#a8adb8' }}
-                            >
-                              <Pencil size={14} />
-                            </button>
+                        </td>
 
-                            {/* Compartilhar */}
-                            <button
-                              onClick={() => setShareContrato(contrato)}
-                              title="Compartilhar"
-                              className="rounded-lg p-1.5 transition-colors hover:opacity-80"
-                              style={{ color: '#3D5A80' }}
-                            >
-                              <Share2 size={14} />
-                            </button>
+                        {/* Tipo */}
+                        <td className="px-4 py-3 text-xs" style={{ color: '#F2F0EB' }}>
+                          {contrato.tipoProjeto}
+                        </td>
 
-                            {/* Download PDF */}
-                            <button
-                              onClick={() => handleDownloadPDF(contrato.id)}
-                              title="Download PDF"
-                              disabled={downloadingId === contrato.id}
-                              className="rounded-lg p-1.5 transition-colors hover:opacity-80 disabled:opacity-40"
-                              style={{ color: '#FF6B35' }}
-                            >
-                              <FileDown size={14} />
-                            </button>
+                        {/* Valor */}
+                        <td className="px-4 py-3 text-xs font-medium" style={{ color: '#FF6B35' }}>
+                          {formatCurrency(contrato.valorTotal)}
+                        </td>
 
-                            {/* Excluir */}
-                            <button
-                              onClick={() => setDeleteConfirmId(contrato.id)}
-                              title="Excluir"
-                              className="rounded-lg p-1.5 transition-colors hover:opacity-80"
-                              style={{ color: '#ef4444' }}
-                            >
-                              <Trash2 size={14} />
-                            </button>
-                          </div>
-                        )}
-                      </td>
-                    </motion.tr>
-                  ))}
-                </AnimatePresence>
-              </tbody>
-            </table>
-          </div>
+                        {/* Status contrato */}
+                        <td className="px-4 py-3">
+                          <StatusBadge status={contrato.status} />
+                        </td>
+
+                        {/* Status pagamento */}
+                        <td className="px-4 py-3">
+                          <PagamentoBadge status={contrato.statusPagamento} />
+                        </td>
+
+                        {/* Ações */}
+                        <td className="px-4 py-3">
+                          {deleteConfirmId === contrato.id ? (
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs" style={{ color: '#a8adb8' }}>
+                                Confirmar?
+                              </span>
+                              <button
+                                onClick={() => handleDelete(contrato.id)}
+                                className="text-xs font-medium px-2 py-1 rounded"
+                                style={{ backgroundColor: 'rgba(239,68,68,0.15)', color: '#ef4444' }}
+                              >
+                                Sim
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(null)}
+                                className="text-xs px-2 py-1 rounded"
+                                style={{ color: '#a8adb8' }}
+                              >
+                                Não
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => router.push(`/admin/contratos/${contrato.id}/editar`)}
+                                title="Editar"
+                                className="rounded-lg p-1.5 transition-colors hover:opacity-80"
+                                style={{ color: '#a8adb8' }}
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button
+                                onClick={() => setShareContrato(contrato)}
+                                title="Compartilhar"
+                                className="rounded-lg p-1.5 transition-colors hover:opacity-80"
+                                style={{ color: '#3D5A80' }}
+                              >
+                                <Share2 size={14} />
+                              </button>
+                              <button
+                                onClick={() => handleDownloadPDF(contrato.id)}
+                                title="Download PDF"
+                                disabled={downloadingId === contrato.id}
+                                className="rounded-lg p-1.5 transition-colors hover:opacity-80 disabled:opacity-40"
+                                style={{ color: '#FF6B35' }}
+                              >
+                                <FileDown size={14} />
+                              </button>
+                              <button
+                                onClick={() => setDeleteConfirmId(contrato.id)}
+                                title="Excluir"
+                                className="rounded-lg p-1.5 transition-colors hover:opacity-80"
+                                style={{ color: '#ef4444' }}
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          )}
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </AnimatePresence>
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </main>
 
