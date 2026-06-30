@@ -1,23 +1,47 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { Droppable, Draggable } from '@hello-pangea/dnd'
 import { Popover } from '@base-ui/react/popover'
-import { Info } from 'lucide-react'
+import { Info, Thermometer, CalendarClock } from 'lucide-react'
 import type { Column } from '../_data'
 import type { Contact } from '../_types'
 import { ContactCard } from './ContactCard'
 
+type ActivitySummary = { scheduledFor: string; overdue: boolean }
+type ColSort = 'temperatura' | 'agenda'
+
 type Props = {
   column: Column
   contacts: Contact[]
+  sort: ColSort
+  onSortChange: (sort: ColSort) => void
   onEdit: (c: Contact) => void
   onDelete: (id: string) => void
   briefingStatus?: Record<string, boolean>
   onViewBriefing?: (c: Contact) => void
   onCopyBriefingLink?: (c: Contact) => void
+  activitySummary?: Record<string, ActivitySummary | null>
 }
 
-export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatus, onViewBriefing, onCopyBriefingLink }: Props) {
+export function KanbanColumn({
+  column, contacts, sort, onSortChange,
+  onEdit, onDelete, briefingStatus, onViewBriefing, onCopyBriefingLink,
+  activitySummary,
+}: Props) {
+  const [visibleCount, setVisibleCount] = useState(3)
+
+  // Reset when the set of contacts in this column changes (add/remove/filter)
+  // Using sorted ids so reordering alone doesn't trigger a reset
+  const contactKey = contacts.map(c => c.id).sort().join(',')
+  useEffect(() => {
+    setVisibleCount(3)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contactKey])
+
+  const visibleContacts = contacts.slice(0, visibleCount)
+  const hiddenCount = contacts.length - visibleCount
+
   return (
     <div
       className="flex flex-col shrink-0 rounded-xl overflow-hidden"
@@ -25,7 +49,7 @@ export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatu
     >
       {/* Column header */}
       <div
-        className="flex items-center gap-2 px-3 py-2.5"
+        className="flex items-center gap-1.5 px-3 py-2.5"
         style={{
           backgroundColor: column.color + '28',
           borderBottom: `2px solid ${column.color}`,
@@ -37,12 +61,42 @@ export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatu
         >
           {column.label}
         </span>
+
         <span
           className="text-xs font-mono px-1.5 py-0.5 rounded shrink-0"
           style={{ backgroundColor: 'rgba(0,0,0,0.3)', color: '#a8adb8' }}
         >
           {contacts.length}
         </span>
+
+        {/* Sort toggle */}
+        <div
+          className="flex items-center shrink-0 rounded"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.25)',
+            border: '1px solid rgba(242,240,235,0.08)',
+            padding: '1px',
+          }}
+        >
+          {([
+            { id: 'temperatura' as ColSort, Icon: Thermometer, title: 'Ordenar por temperatura' },
+            { id: 'agenda'      as ColSort, Icon: CalendarClock, title: 'Ordenar por próxima atividade' },
+          ]).map(({ id, Icon, title }) => (
+            <button
+              key={id}
+              title={title}
+              onClick={() => onSortChange(id)}
+              className="p-1 rounded transition-colors"
+              style={{
+                backgroundColor: sort === id ? 'rgba(242,240,235,0.15)' : 'transparent',
+                color: sort === id ? '#FF6B35' : '#6b7280',
+              }}
+            >
+              <Icon size={10} />
+            </button>
+          ))}
+        </div>
+
         <Popover.Root>
           <Popover.Trigger
             className="shrink-0 p-0.5 rounded transition-colors hover:bg-white/10"
@@ -82,7 +136,7 @@ export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatu
                 : 'transparent',
             }}
           >
-            {contacts.map((c, index) => (
+            {visibleContacts.map((c, index) => (
               <Draggable key={c.id} draggableId={c.id} index={index}>
                 {(drag, dragSnap) => (
                   <div
@@ -101,6 +155,7 @@ export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatu
                       briefingPreenchido={briefingStatus?.[c.id]}
                       onViewBriefing={onViewBriefing ? () => onViewBriefing(c) : undefined}
                       onCopyBriefingLink={onCopyBriefingLink ? () => onCopyBriefingLink(c) : undefined}
+                      nextActivity={activitySummary?.[c.id] ?? undefined}
                     />
                   </div>
                 )}
@@ -110,6 +165,22 @@ export function KanbanColumn({ column, contacts, onEdit, onDelete, briefingStatu
           </div>
         )}
       </Droppable>
+
+      {/* Ver mais */}
+      {hiddenCount > 0 && (
+        <div className="px-2 pb-2">
+          <button
+            onClick={() => setVisibleCount(v => v + 3)}
+            className="w-full py-1.5 rounded-lg text-xs font-medium transition-colors bg-transparent hover:bg-[#3D5A80]/20"
+            style={{
+              border: '1px solid rgba(61,90,128,0.4)',
+              color: '#F2F0EB',
+            }}
+          >
+            Ver mais ({hiddenCount})
+          </button>
+        </div>
+      )}
     </div>
   )
 }

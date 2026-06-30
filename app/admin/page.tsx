@@ -3,20 +3,24 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { DragDropContext, type DropResult } from '@hello-pangea/dnd'
-import { Plus, LogOut, Cloud, CloudOff, FileText } from 'lucide-react'
+import { Plus, LogOut, Cloud, CloudOff, FileText, FileUp } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import type { Contact, Temperature } from './_types'
+import type { Contact, Temperature, Activity } from './_types'
 import { COLUMNS, INITIAL_CONTACTS } from './_data'
 import { KanbanColumn } from './_components/KanbanColumn'
 import { ContactModal } from './_components/ContactModal'
 import { LostModal } from './_components/LostModal'
 import { BriefingModal } from './_components/BriefingModal'
+import { ImportModal } from './_components/ImportModal'
+import { FilterBar, emptyFilters, applyFilters, type FilterState } from './_components/FilterBar'
 
 const STORAGE_KEY = 'primeore_contacts'
+const COL_SORTS_KEY = 'primeore_col_sorts'
 const TEMP_ORDER: Record<Temperature, number> = { quente: 0, morno: 1, frio: 2 }
 
 type SyncStatus = 'synced' | 'syncing' | 'offline'
+type ColSort = 'temperatura' | 'agenda'
 
 function sortByTemp(list: Contact[]): Contact[] {
   return [...list].sort(
@@ -24,14 +28,47 @@ function sortByTemp(list: Contact[]): Contact[] {
   )
 }
 
+function sortByAgenda(
+  list: Contact[],
+  activitySummary: Record<string, { scheduledFor: string; overdue: boolean } | null>,
+): Contact[] {
+  return [...list].sort((a, b) => {
+    const sa = activitySummary[a.id]
+    const sb = activitySummary[b.id]
+    // Grupo 1: ambos com atividade → mais próximo primeiro (vencidos sobem pois data menor)
+    if (sa && sb) return sa.scheduledFor.localeCompare(sb.scheduledFor)
+    if (sa) return -1
+    if (sb) return 1
+    // Grupo 2: sem atividade → último contato DESC (mais recente primeiro, null por último)
+    const la = a.lastContact
+    const lb = b.lastContact
+    if (la && lb) return lb.localeCompare(la)
+    if (la) return -1
+    if (lb) return 1
+    return 0
+  })
+}
+
+function migrateNicho(c: Contact): Contact {
+  if (c.nicho) return c
+  const hasImportFields = !!(
+    c.linkMaps || c.statusSite || c.bairro || c.categoria ||
+    c.linkSocial || c.nota !== undefined || c.avaliacoes !== undefined
+  )
+  if (c.company && hasImportFields) {
+    return { ...c, nicho: c.company, company: '' }
+  }
+  return c
+}
+
 function backfill(list: Contact[]): Contact[] {
   return list.map(c => {
     const raw = c as Contact & { service?: string }
-    return {
+    return migrateNicho({
       ...c,
       temperature: (c.temperature ?? 'morno') as Temperature,
       services: c.services ?? (raw.service ? [raw.service] : []),
-    }
+    })
   })
 }
 
@@ -66,9 +103,22 @@ export default function AdminPage() {
   const [toast, setToast] = useState<string | null>(null)
   const briefingFetched = useRef(false)
 
+  const [importOpen, setImportOpen] = useState(false)
+  const [filters, setFilters] = useState<FilterState>(emptyFilters())
+  const [colSorts, setColSorts] = useState<Record<string, ColSort>>({})
+  const [activityDates, setActivityDates] = useState<Record<string, { scheduledFor: string; overdue: boolean } | null>>({})
+
   // When true, the next run of the persist effect skips the Redis POST
   // (used after we just loaded data FROM Redis — no need to echo it back)
   const skipNextSync = useRef(false)
+
+  // ── Load persisted column sorts from localStorage ──
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(COL_SORTS_KEY)
+      if (raw) setColSorts(JSON.parse(raw) as Record<string, ColSort>)
+    } catch {}
+  }, [])
 
   // ── Initial load: Redis first, localStorage as fallback ──
   useEffect(() => {
@@ -100,6 +150,21 @@ export default function AdminPage() {
 
     load()
   }, [])
+
+  // ── Load activity summaries for all contacts once after hydration ──
+  useEffect(() => {
+    if (!hydrated || contacts.length === 0) return
+    const ids = contacts.map(c => c.id).join(',')
+    fetch(`/api/activities/summary?ids=${ids}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => {
+        if (data && typeof data === 'object') {
+          setActivityDates(prev => ({ ...prev, ...data }))
+        }
+      })
+      .catch(() => {})
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated])
 
   // ── Fetch briefing status for "Fechado" contacts (once after hydration) ──
   useEffect(() => {
@@ -146,6 +211,43 @@ export default function AdminPage() {
       .then(r => setSyncStatus(r.ok ? 'synced' : 'offline'))
       .catch(() => setSyncStatus('offline'))
   }, [contacts, hydrated])
+
+  async function loadActivityDatesForColumn(colContacts: Contact[]) {
+    const now = new Date()
+    const results = await Promise.all(
+      colContacts.map(c =>
+        fetch(`/api/activities/${c.id}`)
+          .then(r => r.json() as Promise<Activity[]>)
+          .then(list => {
+            const pending = (Array.isArray(list) ? list : []).filter(a => !a.completed)
+            if (pending.length === 0) return { id: c.id, summary: null }
+            const next = pending.reduce((a, b) => a.scheduledFor < b.scheduledFor ? a : b)
+            return {
+              id: c.id,
+              summary: {
+                scheduledFor: next.scheduledFor,
+                overdue: new Date(next.scheduledFor) < now,
+              },
+            }
+          })
+          .catch(() => ({ id: c.id, summary: null })),
+      ),
+    )
+    setActivityDates(prev => {
+      const next = { ...prev }
+      results.forEach(r => { next[r.id] = r.summary })
+      return next
+    })
+  }
+
+  function handleSortChange(colId: string, sort: ColSort) {
+    const next = { ...colSorts, [colId]: sort }
+    setColSorts(next)
+    try { localStorage.setItem(COL_SORTS_KEY, JSON.stringify(next)) } catch {}
+    if (sort === 'agenda') {
+      loadActivityDatesForColumn(contacts.filter(c => c.status === colId))
+    }
+  }
 
   async function handleLogout() {
     await fetch('/api/auth/logout', { method: 'POST' })
@@ -201,6 +303,10 @@ export default function AdminPage() {
     setContacts(prev => prev.filter(c => c.id !== id))
   }
 
+  function handleImport(newContacts: Contact[]) {
+    setContacts(prev => [...newContacts, ...prev])
+  }
+
   function openEdit(c: Contact) {
     setEditingContact(c)
     setModalOpen(true)
@@ -228,6 +334,8 @@ export default function AdminPage() {
   }
 
   if (!hydrated) return null
+
+  const filteredContacts = applyFilters(contacts, filters)
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#16191F' }}>
@@ -260,6 +368,16 @@ export default function AdminPage() {
           </Link>
           <Button
             size="sm"
+            variant="ghost"
+            onClick={() => setImportOpen(true)}
+            className="gap-1.5 text-xs"
+            style={{ color: '#a8adb8' }}
+          >
+            <FileUp size={13} />
+            Importar
+          </Button>
+          <Button
+            size="sm"
             onClick={openNew}
             className="gap-1.5 text-xs"
             style={{ backgroundColor: '#FF6B35', color: '#fff' }}
@@ -280,6 +398,15 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {/* Filter bar */}
+      <FilterBar
+        contacts={contacts}
+        totalCount={contacts.length}
+        filteredCount={filteredContacts.length}
+        value={filters}
+        onChange={setFilters}
+      />
+
       {/* Board */}
       <div className="flex-1 overflow-x-auto overflow-y-hidden">
         <DragDropContext onDragEnd={handleDragEnd}>
@@ -287,21 +414,38 @@ export default function AdminPage() {
             className="flex gap-3 p-4 h-full"
             style={{ width: 'max-content', minHeight: 'calc(100vh - 49px)' }}
           >
-            {COLUMNS.map(col => (
-              <KanbanColumn
-                key={col.id}
-                column={col}
-                contacts={sortByTemp(contacts.filter(c => c.status === col.id))}
-                onEdit={openEdit}
-                onDelete={handleDelete}
-                briefingStatus={briefingStatus}
-                onViewBriefing={handleViewBriefing}
-                onCopyBriefingLink={handleCopyBriefingLink}
-              />
-            ))}
+            {COLUMNS.map(col => {
+              const sort = colSorts[col.id] ?? 'temperatura'
+              const colContacts = filteredContacts.filter(c => c.status === col.id)
+              const sorted = sort === 'agenda'
+                ? sortByAgenda(colContacts, activityDates)
+                : sortByTemp(colContacts)
+              return (
+                <KanbanColumn
+                  key={col.id}
+                  column={col}
+                  contacts={sorted}
+                  sort={sort}
+                  onSortChange={s => handleSortChange(col.id, s)}
+                  onEdit={openEdit}
+                  onDelete={handleDelete}
+                  briefingStatus={briefingStatus}
+                  onViewBriefing={handleViewBriefing}
+                  onCopyBriefingLink={handleCopyBriefingLink}
+                  activitySummary={activityDates}
+                />
+              )
+            })}
           </div>
         </DragDropContext>
       </div>
+
+      <ImportModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        existingContacts={contacts}
+        onImport={handleImport}
+      />
 
       <ContactModal
         open={modalOpen}

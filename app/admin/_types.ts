@@ -30,6 +30,27 @@ export type Contact = {
   createdAt: string
   briefingPreenchido?: boolean
   socialMedia?: SocialMedia[]
+  // Campos de prospecção (importação de planilha)
+  nicho?: string
+  categoria?: string
+  bairro?: string
+  statusSite?: 'Sem site' | 'Rede social/Link'
+  linkSocial?: string
+  endereco?: string
+  nota?: number
+  avaliacoes?: number
+  linkMaps?: string
+}
+
+export type Activity = {
+  id: string
+  contactId: string
+  type: 'lembrete' | 'ligacao' | 'reuniao' | 'mensagem'
+  scheduledFor: string
+  note: string
+  completed: boolean
+  createdAt: string
+  completedAt?: string
 }
 
 export type Briefing = {
