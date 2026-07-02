@@ -32,13 +32,13 @@ const SERVICE_TYPES: ServiceType[] = [
   },
   {
     icon: Target,
-    name: "Landing de Captura",
+    name: "Página de Captura",
     forWhat: "Página única, focada em captar contato de quem tem interesse — formulário ou WhatsApp direto.",
     benefit: "Gera lead qualificado antes de qualquer campanha paga rodar.",
   },
   {
     icon: TrendingUp,
-    name: "Landing de Vendas",
+    name: "Página de Vendas",
     forWhat: "Página construída pra vender uma oferta específica, com foco total em conversão.",
     benefit: "Ideal pra lançamento ou promoção com prazo — sem distrair o visitante com outras informações.",
   },
