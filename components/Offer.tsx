@@ -108,7 +108,7 @@ export default function Offer() {
                       <Megaphone className="h-4 w-4 text-accent" strokeWidth={2} />
                     </span>
                     <p className="text-sm text-foreground-dim leading-relaxed">
-                      Pronto pra rodar anúncio no Google, Meta e Instagram assim que você decidir.
+                      Pronto pra rodar anúncio no Google, Facebook e Instagram assim que você decidir.
                     </p>
                   </div>
                 </div>
