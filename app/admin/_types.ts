@@ -25,6 +25,7 @@ export type Contact = {
   temperature: Temperature
   phone?: string
   email?: string
+  website?: string
   collaborators?: Collaborator[]
   lostReason?: string
   createdAt: string

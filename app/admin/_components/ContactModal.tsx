@@ -29,6 +29,7 @@ type FormState = {
   temperature: Temperature
   phone: string
   email: string
+  website: string
   lostReason: string
 }
 
@@ -79,6 +80,7 @@ function emptyForm(): FormState {
     temperature: 'morno',
     phone: '',
     email: '',
+    website: '',
     lostReason: '',
   }
 }
@@ -180,6 +182,7 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
         temperature: initial.temperature ?? 'morno',
         phone: initial.phone ?? '',
         email: initial.email ?? '',
+        website: initial.website ?? '',
         lostReason: initial.lostReason ?? '',
       })
       setCollabs(
@@ -316,6 +319,7 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
       temperature: form.temperature,
       phone: form.phone.trim() || undefined,
       email: form.email.trim() || undefined,
+      website: form.website.trim() || undefined,
       collaborators: saved.length > 0 ? saved : undefined,
       lostReason: form.status === 'Perdido' ? form.lostReason.trim() : undefined,
       createdAt: initial?.createdAt ?? now,
@@ -535,6 +539,15 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
                           placeholder="email@empresa.com"
                         />
                       </Field>
+                      <div className="col-span-2">
+                        <Field label="Site">
+                          <Input
+                            value={form.website}
+                            onChange={e => set('website', e.target.value)}
+                            placeholder="https://seusite.com.br"
+                          />
+                        </Field>
+                      </div>
                     </div>
 
                     {/* Redes Sociais */}

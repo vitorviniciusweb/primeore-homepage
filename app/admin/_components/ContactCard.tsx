@@ -115,6 +115,7 @@ export function ContactCard({
   const hasPhone = digits.length >= 10
   const filledSocials = (contact.socialMedia ?? []).filter(s => s.url)
   const svcLabel = servicesLabel(contact.services ?? [])
+  const hasWebsite = !!contact.website
 
   return (
     <div
@@ -192,24 +193,39 @@ export function ContactCard({
           {contact.channel}
         </span>
 
-        {hasPhone && (
+        {(hasPhone || hasWebsite) && (
           <div className="flex gap-1 shrink-0" onClick={e => e.stopPropagation()}>
-            <a
-              href={`tel:+55${digits}`}
-              title="Ligar"
-              className="p-1 rounded hover:bg-white/10 transition-colors"
-            >
-              <Phone size={11} style={{ color: '#a8adb8' }} />
-            </a>
-            <a
-              href={`https://wa.me/55${digits}`}
-              target="_blank"
-              rel="noreferrer"
-              title="WhatsApp"
-              className="p-1 rounded hover:bg-white/10 transition-colors"
-            >
-              <MessageCircle size={11} style={{ color: '#a8adb8' }} />
-            </a>
+            {hasPhone && (
+              <>
+                <a
+                  href={`tel:+55${digits}`}
+                  title="Ligar"
+                  className="p-1 rounded hover:bg-white/10 transition-colors"
+                >
+                  <Phone size={11} style={{ color: '#a8adb8' }} />
+                </a>
+                <a
+                  href={`https://wa.me/55${digits}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  title="WhatsApp"
+                  className="p-1 rounded hover:bg-white/10 transition-colors"
+                >
+                  <MessageCircle size={11} style={{ color: '#a8adb8' }} />
+                </a>
+              </>
+            )}
+            {hasWebsite && (
+              <a
+                href={contact.website!.startsWith('http') ? contact.website! : `https://${contact.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Site"
+                className="p-1 rounded hover:bg-white/10 transition-colors"
+              >
+                <Globe size={11} style={{ color: '#a8adb8' }} />
+              </a>
+            )}
           </div>
         )}
       </div>
