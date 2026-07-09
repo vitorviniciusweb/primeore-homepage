@@ -13,6 +13,13 @@ export type SocialMedia = {
   url: string
 }
 
+export type ProjectStatus = {
+  startDate: string // ISO date
+  deadline: string // ISO date
+  status: 'Em andamento' | 'Aguardando cliente' | 'Entregue'
+  notes: string
+}
+
 export type Contact = {
   id: string
   name: string
@@ -41,18 +48,22 @@ export type Contact = {
   nota?: number
   avaliacoes?: number
   linkMaps?: string
+  projectStatus?: ProjectStatus
 }
 
 export type Activity = {
   id: string
   contactId: string
-  type: 'lembrete' | 'ligacao' | 'reuniao' | 'mensagem'
+  type: 'lembrete' | 'ligacao' | 'reuniao' | 'mensagem' | 'tarefa'
   scheduledFor: string
   note: string
   completed: boolean
   createdAt: string
   completedAt?: string
+  meetingLink?: string
 }
+
+export type ActivityWithContact = Activity & { contactName: string }
 
 export type Briefing = {
   contactId: string

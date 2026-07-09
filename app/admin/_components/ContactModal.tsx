@@ -819,7 +819,7 @@ export function ContactModal({ open, onClose, onSave, onDelete, initial }: Props
             {/* ── Aba: Atividades ── */}
             {activeTab === 'atividades' && initial && (
               <div className="px-5 py-4">
-                <ActivitySection contactId={initial.id} />
+                <ActivitySection contactId={initial.id} contact={initial} />
               </div>
             )}
 

@@ -22,6 +22,12 @@ const TEMP_CONFIG: Record<
   frio:   { label: 'Frio',   color: '#3D5A80', icon: '●' },
 }
 
+const PROJECT_STATUS_COLOR: Record<string, string> = {
+  'Em andamento': '#3D5A80',
+  'Aguardando cliente': '#f59e0b',
+  'Entregue': '#22c55e',
+}
+
 function formatDate(iso: string): string {
   if (!iso) return '—'
   try {
@@ -309,6 +315,19 @@ export function ContactCard({
                 <ClipboardCopy size={9} />
                 Copiar link
               </button>
+            </div>
+          )}
+          {contact.projectStatus && (
+            <div className="mt-1.5">
+              <span
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-semibold"
+                style={{
+                  backgroundColor: `${PROJECT_STATUS_COLOR[contact.projectStatus.status]}20`,
+                  color: PROJECT_STATUS_COLOR[contact.projectStatus.status],
+                }}
+              >
+                Projeto: {contact.projectStatus.status}
+              </span>
             </div>
           )}
         </div>

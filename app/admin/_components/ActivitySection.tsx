@@ -1,21 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Bell, Phone, Calendar, MessageCircle, Trash2, Plus, X } from 'lucide-react'
+import { Trash2, Plus, X, ExternalLink, Share2 } from 'lucide-react'
 import type { Activity, Contact } from '../_types'
 import { Button } from '@/components/ui/button'
+import { ACTIVITY_TYPE_CONFIG as TYPE_CONFIG, formatDateTime, type ActivityType } from '../_activity-utils'
+import { MeetingShareModal } from './MeetingShareModal'
 
 type Props = {
   contactId: string
-}
-
-type ActivityType = Activity['type']
-
-const TYPE_CONFIG: Record<ActivityType, { label: string; Icon: React.ElementType; color: string }> = {
-  lembrete: { label: 'Lembrete',  Icon: Bell,           color: '#f59e0b' },
-  ligacao:  { label: 'Ligação',   Icon: Phone,          color: '#22c55e' },
-  reuniao:  { label: 'Reunião',   Icon: Calendar,       color: '#3D5A80' },
-  mensagem: { label: 'Mensagem',  Icon: MessageCircle,  color: '#a855f7' },
+  contact: Contact
 }
 
 function uid() {
@@ -27,17 +21,6 @@ function nextHourISO(): string {
   d.setMinutes(0, 0, 0)
   d.setHours(d.getHours() + 1)
   return d.toISOString().slice(0, 16)
-}
-
-function formatDateTime(iso: string): string {
-  try {
-    return new Date(iso).toLocaleString('pt-BR', {
-      day: '2-digit', month: 'short', year: 'numeric',
-      hour: '2-digit', minute: '2-digit',
-    })
-  } catch {
-    return iso
-  }
 }
 
 const textareaStyle: React.CSSProperties = {
@@ -53,15 +36,17 @@ const selectStyle: React.CSSProperties = {
   outline: 'none',
 }
 
-export function ActivitySection({ contactId }: Props) {
+export function ActivitySection({ contactId, contact }: Props) {
   const [activities, setActivities] = useState<Activity[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [shareActivity, setShareActivity] = useState<Activity | null>(null)
 
   // Form state
   const [formType, setFormType] = useState<ActivityType>('lembrete')
   const [formScheduledFor, setFormScheduledFor] = useState(nextHourISO())
   const [formNote, setFormNote] = useState('')
+  const [formMeetingLink, setFormMeetingLink] = useState('')
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -92,6 +77,7 @@ export function ActivitySection({ contactId }: Props) {
       note: formNote.trim(),
       completed: false,
       createdAt: new Date().toISOString(),
+      meetingLink: formType === 'reuniao' && formMeetingLink.trim() ? formMeetingLink.trim() : undefined,
     }
     try {
       await fetch(`/api/activities/${contactId}`, {
@@ -104,6 +90,7 @@ export function ActivitySection({ contactId }: Props) {
       setFormType('lembrete')
       setFormScheduledFor(nextHourISO())
       setFormNote('')
+      setFormMeetingLink('')
       // Fire and forget: atualiza lastContact do contato com a data de hoje
       ;(async () => {
         try {
@@ -225,7 +212,7 @@ export function ActivitySection({ contactId }: Props) {
           </div>
 
           {/* Tipo */}
-          <div className="grid grid-cols-4 gap-1.5">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5">
             {(Object.entries(TYPE_CONFIG) as [ActivityType, typeof TYPE_CONFIG[ActivityType]][]).map(([key, cfg]) => {
               const active = formType === key
               return (
@@ -254,6 +241,18 @@ export function ActivitySection({ contactId }: Props) {
             className="flex h-9 w-full rounded-lg border px-3 text-xs"
             style={selectStyle}
           />
+
+          {/* Link da reunião — apenas para o tipo Reunião */}
+          {formType === 'reuniao' && (
+            <input
+              type="text"
+              value={formMeetingLink}
+              onChange={e => setFormMeetingLink(e.target.value)}
+              placeholder="https://meet.google.com/..."
+              className="flex h-9 w-full rounded-lg border px-3 text-xs"
+              style={selectStyle}
+            />
+          )}
 
           {/* Nota */}
           <textarea
@@ -295,10 +294,20 @@ export function ActivitySection({ contactId }: Props) {
               activity={a}
               onToggle={toggleCompleted}
               onDelete={handleDelete}
+              onShare={setShareActivity}
             />
           ))}
         </div>
       )}
+
+      <MeetingShareModal
+        open={!!shareActivity}
+        onClose={() => setShareActivity(null)}
+        contactName={contact.name}
+        contactPhone={contact.phone}
+        scheduledFor={shareActivity?.scheduledFor ?? ''}
+        meetingLink={shareActivity?.meetingLink ?? ''}
+      />
     </div>
   )
 }
@@ -351,13 +360,16 @@ function ActivityItem({
   activity,
   onToggle,
   onDelete,
+  onShare,
 }: {
   activity: Activity
   onToggle: (id: string, completed: boolean) => void
   onDelete: (id: string) => void
+  onShare: (activity: Activity) => void
 }) {
   const cfg = TYPE_CONFIG[activity.type]
   const isOverdue = !activity.completed && new Date(activity.scheduledFor) < new Date()
+  const isMeetingWithLink = activity.type === 'reuniao' && !!activity.meetingLink
 
   return (
     <div
@@ -396,6 +408,14 @@ function ActivityItem({
           >
             {cfg.label}
           </span>
+          {activity.type === 'tarefa' && (
+            <span
+              className="text-[9px] font-semibold px-1.5 py-0.5 rounded"
+              style={{ backgroundColor: 'rgba(255,107,53,0.15)', color: '#FF6B35' }}
+            >
+              Projeto
+            </span>
+          )}
           <span className="text-[10px]" style={{ color: '#6b7280' }}>
             {formatDateTime(activity.scheduledFor)}
           </span>
@@ -418,6 +438,28 @@ function ActivityItem({
           >
             {activity.note}
           </p>
+        )}
+        {isMeetingWithLink && (
+          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+            <a
+              href={activity.meetingLink}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded transition-colors hover:bg-white/10"
+              style={{ color: '#3D5A80', border: '1px solid rgba(61,90,128,0.4)' }}
+            >
+              <ExternalLink size={10} />
+              Abrir reunião
+            </a>
+            <button
+              onClick={() => onShare(activity)}
+              className="flex items-center gap-1 text-[10px] font-medium px-2 py-1 rounded transition-colors hover:bg-white/10"
+              style={{ color: '#FF6B35', border: '1px solid rgba(255,107,53,0.3)' }}
+            >
+              <Share2 size={10} />
+              Compartilhar
+            </button>
+          </div>
         )}
       </div>
 

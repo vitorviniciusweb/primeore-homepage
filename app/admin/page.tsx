@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { DragDropContext, type DropResult } from '@hello-pangea/dnd'
-import { Plus, LogOut, Cloud, CloudOff, FileText, FileUp } from 'lucide-react'
+import { Plus, LogOut, Cloud, CloudOff, FileText, FileUp, CalendarDays } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import type { Contact, Temperature, Activity } from './_types'
@@ -164,6 +164,20 @@ export default function AdminPage() {
       })
       .catch(() => {})
   // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated])
+
+  // ── Open ContactModal via ?contactId= query param (deep link from /admin/agenda) ──
+  useEffect(() => {
+    if (!hydrated) return
+    const params = new URLSearchParams(window.location.search)
+    const contactId = params.get('contactId')
+    if (!contactId) return
+    const target = contacts.find(c => c.id === contactId)
+    if (target) {
+      openEdit(target)
+      router.replace('/admin')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated])
 
   // ── Fetch briefing status for "Fechado" contacts (once after hydration) ──
@@ -355,6 +369,17 @@ export default function AdminPage() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Link href="/admin/agenda">
+            <Button
+              size="sm"
+              variant="ghost"
+              className="gap-1.5 text-xs"
+              style={{ color: '#a8adb8' }}
+            >
+              <CalendarDays size={13} />
+              Agenda
+            </Button>
+          </Link>
           <Link href="/admin/contratos">
             <Button
               size="sm"

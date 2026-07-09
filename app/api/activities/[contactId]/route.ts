@@ -48,6 +48,15 @@ export async function POST(
   }
 }
 
+type PatchBody = {
+  id: string
+  completed?: boolean
+  type?: Activity['type']
+  scheduledFor?: string
+  note?: string
+  meetingLink?: string | null
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ contactId: string }> },
@@ -55,13 +64,21 @@ export async function PATCH(
   if (!(await requireAuth())) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const { contactId } = await params
-    const { id, completed } = (await req.json()) as { id: string; completed: boolean }
+    const { id, completed, type, scheduledFor, note, meetingLink } = (await req.json()) as PatchBody
     const existing = await getActivities(contactId)
-    const updated = existing.map(a =>
-      a.id === id
-        ? { ...a, completed, completedAt: completed ? new Date().toISOString() : undefined }
-        : a,
-    )
+    const updated = existing.map(a => {
+      if (a.id !== id) return a
+      const next: Activity = { ...a }
+      if (completed !== undefined) {
+        next.completed = completed
+        next.completedAt = completed ? new Date().toISOString() : undefined
+      }
+      if (type !== undefined) next.type = type
+      if (scheduledFor !== undefined) next.scheduledFor = scheduledFor
+      if (note !== undefined) next.note = note
+      if (meetingLink !== undefined) next.meetingLink = meetingLink === null ? undefined : meetingLink
+      return next
+    })
     await getRedis().set(redisKey(contactId), updated)
     return NextResponse.json({ success: true })
   } catch (e) {
