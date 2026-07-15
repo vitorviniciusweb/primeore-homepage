@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     siteName: 'Ocean Store',
     images: [
       {
-        url: 'https://primeore.com.br/ocean-store/logo.png',
+        url: 'https://primeore.com.br/ocean-store/ocean-store-logo.png',
         width: 1901,
         height: 995,
         alt: 'Ocean Store',
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     title: 'Ocean Store — Identidade Visual',
     description:
       'Loja de roupas de praia da Baixada Santista. Da praia, pra praia.',
-    images: ['https://primeore.com.br/ocean-store/logo.png'],
+    images: ['https://primeore.com.br/ocean-store/ocean-store-logo.png'],
   },
 }
 

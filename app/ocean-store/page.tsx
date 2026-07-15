@@ -1,12 +1,11 @@
 import Image from 'next/image'
-import { FaInstagram, FaFacebookF, FaWhatsapp } from 'react-icons/fa'
 import './ocean-store.css'
 
 const colors = [
-  { name: 'Azul-marinho', hex: '#0B2A4A', use: 'Cor primária' },
-  { name: 'Vermelho vibrante', hex: '#D42027', use: 'Cor de destaque' },
+  { name: 'Azul-Marinho', hex: '#0B2A4A', use: 'Cor primária' },
+  { name: 'Vermelho Vibrante', hex: '#D42027', use: 'Cor de destaque' },
   { name: 'Branco', hex: '#FFFFFF', use: 'Cor de contraste' },
-  { name: 'Cinza de apoio', hex: '#4A4A4A', use: 'Textos secundários' },
+  { name: 'Cinza de Apoio', hex: '#4A4A4A', use: 'Textos secundários' },
 ]
 
 const rules = [
@@ -17,40 +16,65 @@ const rules = [
 ]
 
 const products = [
-  { name: 'Camiseta Ocean Basic', price: 'R$ 89,90', color: '#0B2A4A' },
-  { name: 'Boné Trucker Maré', price: 'R$ 69,90', color: '#D42027' },
-  { name: 'Jaqueta Windbreaker Baía', price: 'R$ 249,90', color: '#4A4A4A' },
-  { name: 'Shorts Praia Listrado', price: 'R$ 119,90', color: '#123A63' },
-  { name: 'Regata Areia', price: 'R$ 79,90', color: '#D42027' },
-  { name: 'Boné Aba Curva Ocean', price: 'R$ 59,90', color: '#0B2A4A' },
+  { name: 'Camiseta Ocean Basic', price: 'R$ 89,90', image: 'camiseta-ocean-basic.jpg' },
+  { name: 'Boné Trucker Maré', price: 'R$ 69,90', image: 'bone-trucker-mare.jpg' },
+  { name: 'Jaqueta Windbreaker Baía', price: 'R$ 249,90', image: 'jaqueta-windbreaker-baia.jpg' },
+  { name: 'Shorts Praia Listrado', price: 'R$ 119,90', image: 'shorts-praia-listrado.jpg' },
+  { name: 'Regata Areia', price: 'R$ 79,90', image: 'regata-areia.jpg' },
+  { name: 'Boné Aba Curva Ocean', price: 'R$ 59,90', image: 'bone-aba-curva-ocean.jpg' },
 ]
 
 export default function OceanStorePage() {
   return (
-    <main>
-      {/* 1. Hero */}
-      <section className="os-hero">
-        <div className="wrap">
+    <>
+      <nav className="os-nav">
+        <div className="os-wrap">
+          <div className="os-brand">
+            OCEAN <span>STORE</span>
+          </div>
+          <ul>
+            <li>
+              <a href="#marca">Marca</a>
+            </li>
+            <li>
+              <a href="#paleta">Paleta</a>
+            </li>
+            <li>
+              <a href="#tipografia">Tipografia</a>
+            </li>
+            <li>
+              <a href="#aplicacoes">Aplicações</a>
+            </li>
+            <li>
+              <a href="#regras">Regras de uso</a>
+            </li>
+            <li>
+              <a href="#ecommerce">E-commerce</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <header className="os-hero">
+        <div className="os-wrap">
           <Image
-            src="/ocean-store/logo.png"
-            alt="Ocean Store"
+            className="os-logo-mark"
+            src="/ocean-store/ocean-store-logo.png"
+            alt="Logo Ocean Store"
             width={1901}
             height={995}
-            className="os-hero-logo"
             priority
           />
-          <h1>Ocean Store</h1>
-          <p className="os-slogan">Da praia, pra praia.</p>
-          <span className="os-caption">Mapa de Identidade Visual · Julho 2026</span>
+          <h1>OCEAN STORE</h1>
+          <div className="os-slogan">Da praia, pra praia.</div>
+          <div className="os-eyebrow">Mapa de Identidade Visual · Julho 2026</div>
         </div>
-      </section>
+      </header>
 
-      {/* 2. Sobre a marca */}
-      <section className="os-section os-about">
-        <div className="wrap">
-          <div className="os-section-head">
-            <h2>Sobre a marca</h2>
-          </div>
+      <section id="marca" className="os-sobre">
+        <div className="os-wrap">
+          <div className="os-kicker">A marca</div>
+          <h2 className="os-sec-title">Sobre a Ocean Store</h2>
           <p>
             Ocean Store é a loja de roupas de praia da Baixada Santista, com base em
             Santos e atendimento em Santos, São Vicente e Guarujá. O catálogo reúne
@@ -71,27 +95,27 @@ export default function OceanStorePage() {
         </div>
       </section>
 
-      {/* 3. Paleta de cores */}
-      <section className="os-section os-section--soft">
-        <div className="wrap">
-          <div className="os-section-head">
-            <h2>Paleta de cores</h2>
-            <p>As quatro cores oficiais da marca, com o uso recomendado de cada uma.</p>
-          </div>
-          <div className="os-color-grid">
+      <section id="paleta" className="os-paleta">
+        <div className="os-wrap">
+          <div className="os-kicker">Cores</div>
+          <h2 className="os-sec-title">Paleta de cores</h2>
+          <p className="os-lede">
+            As quatro cores oficiais da marca, com o uso recomendado de cada uma.
+          </p>
+          <div className="os-swatches">
             {colors.map((color) => (
-              <div className="os-color-card" key={color.hex}>
+              <div className="os-swatch" key={color.hex}>
                 <div
-                  className="os-color-swatch"
+                  className="os-block"
                   style={{
-                    backgroundColor: color.hex,
-                    border: color.hex === '#FFFFFF' ? '1px solid var(--os-line)' : 'none',
+                    background: color.hex,
+                    borderBottom: color.hex === '#FFFFFF' ? '1px solid #eee' : undefined,
                   }}
                 />
-                <div className="os-color-info">
-                  <span className="os-color-name">{color.name}</span>
-                  <span className="os-color-hex">{color.hex}</span>
-                  <span className="os-color-use">{color.use}</span>
+                <div className="os-label">
+                  <strong>{color.name}</strong>
+                  <span>{color.hex}</span>
+                  <small>{color.use}</small>
                 </div>
               </div>
             ))}
@@ -99,28 +123,30 @@ export default function OceanStorePage() {
         </div>
       </section>
 
-      {/* 4. Tipografia */}
-      <section className="os-section">
-        <div className="wrap">
-          <div className="os-section-head">
-            <h2>Tipografia</h2>
-            <p>Duas famílias tipográficas cobrem toda a comunicação da marca.</p>
-          </div>
-          <div className="os-type-grid">
+      <section id="tipografia">
+        <div className="os-wrap">
+          <div className="os-kicker">Tipografia</div>
+          <h2 className="os-sec-title">Duas famílias cobrem tudo</h2>
+          <p className="os-lede">
+            Duas famílias tipográficas cobrem toda a comunicação da marca.
+          </p>
+          <div className="os-type-row">
             <div className="os-type-card">
-              <span className="os-type-label">Títulos e destaques</span>
-              <div className="os-type-sample-display">OCEAN STORE</div>
-              <p className="os-type-meta">
-                <strong>Bebas Neue</strong> — condensada, bold, sempre em caixa alta. Usar
-                em títulos, chamadas e destaques curtos.
+              <div className="os-tag">Títulos e destaques</div>
+              <div className="os-sample">OCEAN STORE</div>
+              <hr className="os-rule" />
+              <p className="os-note">
+                <strong>Bebas Neue</strong> — condensada, bold, sempre em caixa alta.
+                Usar em títulos, chamadas e destaques curtos.
               </p>
             </div>
-            <div className="os-type-card">
-              <span className="os-type-label">Corpo de texto</span>
-              <p className="os-type-sample-body">
+            <div className="os-type-card os-body">
+              <div className="os-tag">Corpo de texto</div>
+              <div className="os-sample">
                 Roupas de praia pensadas pra quem vive o mar todos os dias.
-              </p>
-              <p className="os-type-meta">
+              </div>
+              <hr className="os-rule" />
+              <p className="os-note">
                 <strong>Work Sans</strong> — pesos 400 e 600. Usar em textos corridos,
                 descrições e navegação.
               </p>
@@ -129,141 +155,164 @@ export default function OceanStorePage() {
         </div>
       </section>
 
-      {/* 5. Aplicações e uso */}
-      <section className="os-section os-section--soft">
-        <div className="wrap">
-          <div className="os-section-head">
-            <h2>Aplicações e uso</h2>
-            <p>Exemplos de como a logo aparece em diferentes pontos de contato.</p>
-          </div>
+      <section id="aplicacoes" className="os-aplicacoes">
+        <div className="os-wrap">
+          <div className="os-kicker">Uso da marca</div>
+          <h2 className="os-sec-title">Aplicações e uso</h2>
+          <p className="os-lede">
+            Exemplos de como a logo aparece em diferentes pontos de contato.
+          </p>
           <div className="os-app-grid">
             <div className="os-app-card">
-              <div className="os-mock-tag">
-                <Image
-                  src="/ocean-store/logo.png"
-                  alt="Etiqueta Ocean Store"
-                  width={1901}
-                  height={995}
-                />
-              </div>
-              <span className="os-app-label">Etiqueta de roupa</span>
-            </div>
-            <div className="os-app-card">
-              <div className="os-mock-ig">
-                <Image
-                  src="/ocean-store/logo.png"
-                  alt="Post de Instagram Ocean Store"
-                  width={1901}
-                  height={995}
-                />
-              </div>
-              <span className="os-app-label">Post de Instagram</span>
-            </div>
-            <div className="os-app-card">
-              <div className="os-mock-header">
-                <div className="os-mock-header-bar">
+              <div className="os-app-visual">
+                <div className="os-tag-mock">
                   <Image
-                    src="/ocean-store/logo.png"
-                    alt="Cabeçalho de site Ocean Store"
+                    src="/ocean-store/ocean-store-logo.png"
+                    alt="Logo em etiqueta"
                     width={1901}
                     height={995}
                   />
-                  <div className="os-mock-header-nav">
-                    <span />
-                    <span />
-                    <span />
-                  </div>
                 </div>
-                <div className="os-mock-header-body" />
               </div>
-              <span className="os-app-label">Topo de cabeçalho de site</span>
+              <div className="os-app-caption">
+                <strong>Etiqueta de roupa</strong>
+              </div>
+            </div>
+            <div className="os-app-card">
+              <div className="os-app-visual">
+                <div className="os-insta-mock">
+                  <Image
+                    src="/ocean-store/ocean-store-logo.png"
+                    alt="Logo em post"
+                    width={1901}
+                    height={995}
+                  />
+                </div>
+              </div>
+              <div className="os-app-caption">
+                <strong>Post de Instagram</strong>
+              </div>
+            </div>
+            <div className="os-app-card">
+              <div className="os-app-visual" style={{ alignItems: 'flex-start', background: '#fff' }}>
+                <div className="os-header-mock">
+                  <div className="os-bar">
+                    <Image
+                      src="/ocean-store/ocean-store-logo.png"
+                      alt="Logo no cabeçalho"
+                      width={1901}
+                      height={995}
+                    />
+                    <div className="os-lines">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
+                  <div className="os-body" />
+                </div>
+              </div>
+              <div className="os-app-caption">
+                <strong>Topo de cabeçalho de site</strong>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. Regras de uso da logo */}
-      <section className="os-section">
-        <div className="wrap">
-          <div className="os-section-head">
-            <h2>Regras de uso da logo</h2>
-            <p>Poucas regras, mas importantes pra manter a marca consistente.</p>
-          </div>
-          <ul className="os-rules">
+      <section id="regras">
+        <div className="os-wrap">
+          <div className="os-kicker">Boas práticas</div>
+          <h2 className="os-sec-title">Regras de uso da logo</h2>
+          <p className="os-lede">
+            Poucas regras, mas importantes pra manter a marca consistente.
+          </p>
+          <div className="os-regras">
             {rules.map((rule) => (
-              <li key={rule}>
-                <span className="os-rule-mark">✕</span>
-                {rule}
-              </li>
+              <div className="os-regra" key={rule}>
+                <div className="os-x">✕</div>
+                <p>{rule}</p>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </section>
 
-      {/* 7. Pré-visualização do e-commerce */}
-      <section className="os-section os-section--soft">
-        <div className="wrap">
-          <div className="os-section-head">
-            <h2>Pré-visualização do e-commerce</h2>
-            <p>
-              Simulação visual de como a identidade fica aplicada numa loja virtual —
-              layout ilustrativo, sem funcionalidade real.
-            </p>
-          </div>
-          <div className="os-shop">
-            <div className="os-shop-header">
+      <section id="ecommerce" className="os-aplicacoes">
+        <div className="os-wrap">
+          <div className="os-kicker">Simulação</div>
+          <h2 className="os-sec-title">Pré-visualização do e-commerce</h2>
+          <p className="os-ecom-note">
+            Layout ilustrativo, sem funcionalidade real — apenas para visualizar a
+            identidade aplicada a uma loja virtual, com fotos reais geradas para cada
+            peça.
+          </p>
+          <div className="os-ecom-frame">
+            <div className="os-ecom-header">
               <Image
-                src="/ocean-store/logo.png"
-                alt="Ocean Store"
+                src="/ocean-store/ocean-store-logo.png"
+                alt="Logo Ocean Store"
                 width={1901}
                 height={995}
               />
-              <nav className="os-shop-nav">
-                <span>Início</span>
-                <span>Masculino</span>
-                <span>Feminino</span>
-                <span>Ofertas</span>
-                <span>Contato</span>
-              </nav>
+              <ul>
+                <li>
+                  <span>Início</span>
+                </li>
+                <li>
+                  <span>Masculino</span>
+                </li>
+                <li>
+                  <span>Feminino</span>
+                </li>
+                <li>
+                  <span>Ofertas</span>
+                </li>
+                <li>
+                  <span>Contato</span>
+                </li>
+              </ul>
             </div>
-
-            <div className="os-shop-banner">
-              <h3>Da praia, pra praia.</h3>
-              <span className="os-shop-btn">Ver coleção</span>
+            <div className="os-ecom-hero">
+              <h3>DA PRAIA, PRA PRAIA.</h3>
+              <button type="button">VER COLEÇÃO</button>
             </div>
-
-            <div className="os-shop-products">
+            <div className="os-prod-grid">
               {products.map((product) => (
-                <div className="os-shop-product" key={product.name}>
-                  <div
-                    className="os-shop-product-photo"
-                    style={{ backgroundColor: product.color }}
-                  />
-                  <div className="os-shop-product-name">{product.name}</div>
-                  <div className="os-shop-product-price">{product.price}</div>
+                <div className="os-prod-card" key={product.name}>
+                  <div className="os-img-wrap">
+                    <Image
+                      src={`/ocean-store/${product.image}`}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 560px) 100vw, (max-width: 860px) 50vw, 33vw"
+                    />
+                  </div>
+                  <div className="os-info">
+                    <strong>{product.name}</strong>
+                    <span>{product.price}</span>
+                  </div>
                 </div>
               ))}
             </div>
-
-            <div className="os-shop-footer">
-              <div className="os-shop-social">
-                <span>
-                  <FaInstagram />
-                </span>
-                <span>
-                  <FaFacebookF />
-                </span>
-                <span>
-                  <FaWhatsapp />
-                </span>
+            <div className="os-ecom-footer">
+              <div className="os-socials">
+                <span>IG</span>
+                <span>FB</span>
+                <span>WA</span>
               </div>
-              <p>
-                WhatsApp: <strong>(13) 99705-5302</strong>
-              </p>
+              <p>WhatsApp: (13) 99705-5302</p>
             </div>
           </div>
         </div>
       </section>
-    </main>
+
+      <footer className="os-site-footer">
+        <div className="os-wrap">
+          <strong>OCEAN STORE</strong>
+          Mapa de Identidade Visual · Preparado por Vitor Vinícius
+        </div>
+      </footer>
+    </>
   )
 }
