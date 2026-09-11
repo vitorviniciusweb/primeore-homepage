@@ -27,19 +27,19 @@ const SERVICE_TYPES: ServiceType[] = [
   {
     icon: Building2,
     name: "Institucional",
-    forWhat: "Apresenta sua empresa por completo — quem você é, o que faz, por que confiar.",
-    benefit: "Constrói autoridade e te coloca no Google antes mesmo do cliente te procurar.",
+    forWhat: "Apresenta seu negócio por completo — quem você é, o que faz, por que confiar.",
+    benefit: "Constrói autoridade e te coloca no radar do cliente antes mesmo de ele te procurar.",
   },
   {
     icon: Target,
     name: "Página de Captura",
-    forWhat: "Página única, focada em captar contato de quem tem interesse — formulário ou WhatsApp direto.",
+    forWhat: "Página única focada em captar contato de quem tem interesse — formulário ou WhatsApp direto.",
     benefit: "Gera lead qualificado antes de qualquer campanha paga rodar.",
   },
   {
     icon: TrendingUp,
     name: "Página de Vendas",
-    forWhat: "Página construída pra vender uma oferta específica, com foco total em conversão.",
+    forWhat: "Construída pra vender uma oferta específica, com foco total em conversão.",
     benefit: "Ideal pra lançamento ou promoção com prazo — sem distrair o visitante com outras informações.",
   },
   {
@@ -64,17 +64,28 @@ export default function Services() {
           className="mb-14 text-center max-w-2xl mx-auto"
         >
           <span className="text-xs text-accent tracking-[0.15em] uppercase mb-3 block">
-            Formatos de site
+            SERVIÇOS
           </span>
           <h2 className="font-display text-4xl sm:text-5xl font-bold text-foreground mb-4">
-            Qual desses é o seu site?
+            Qual resultado você quer com seu site?
           </h2>
           <p className="text-foreground-dim text-sm sm:text-base leading-relaxed">
-            A gente descobre o formato certo numa conversa de diagnóstico — mas aqui vai um
-            panorama. Todo site Primeore já nasce pronto pra rodar tráfego pago quando você
-            decidir escalar.
+            A gente descobre o caminho certo numa conversa de diagnóstico — mas aqui vai um
+            panorama do que é possível.
           </p>
         </motion.div>
+
+        <div className="text-center mb-10">
+          <a
+            href={WA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={pushWaClick}
+            className="inline-flex items-center gap-2 text-sm text-foreground-dim underline underline-offset-4 hover:text-accent transition-colors"
+          >
+            Não sabe qual é o seu? Bora conversar
+          </a>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {SERVICE_TYPES.map((service, index) => (
@@ -100,6 +111,12 @@ export default function Services() {
               <p className="text-foreground-dim text-sm leading-relaxed">{service.benefit}</p>
             </motion.div>
           ))}
+        </div>
+
+        <div className="text-center mt-10 mb-2">
+          <span className="text-xs text-foreground-dim tracking-wide">
+            ✦ Todo site Primeore já nasce configurado para rodar tráfego pago quando você decidir escalar.
+          </span>
         </div>
 
         <motion.div
