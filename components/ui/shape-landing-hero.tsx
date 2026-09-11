@@ -203,9 +203,9 @@ export default function HeroGeometric({
           animate={textAnimate}
           className="text-base sm:text-lg text-foreground-dim max-w-xl mx-auto mb-10 leading-relaxed"
         >
-          Criamos sites institucionais profissionais para empresários que ainda
-          não têm presença online — ou têm uma que não representa o que o
-          negócio realmente é.
+          Antes de criar seu site, entendo o que você oferece, para quem, e
+          por que escolher você. Depois transformo essa clareza num site
+          profissional que representa seu negócio de verdade.
         </motion.p>
 
         {/* CTAs */}
