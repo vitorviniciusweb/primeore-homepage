@@ -59,8 +59,8 @@ export default function Offer() {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
         >
           <Card className="border border-foreground/10 ring-0">
-            <CardContent className="px-8 py-8 sm:px-10 sm:py-10 max-w-md mx-auto">
-              <ul className="space-y-4">
+            <CardContent className="p-8 md:p-10 max-w-3xl mx-auto">
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 text-left">
                 {DELIVERABLES.map((item) => (
                   <li key={item} className="flex items-start gap-3">
                     <span className="mt-0.5 w-5 h-5 rounded-full bg-accent/15 flex items-center justify-center flex-shrink-0">
