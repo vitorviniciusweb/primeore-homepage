@@ -88,24 +88,24 @@ const cardThemes: CardTheme[] = [
 ];
 
 // ─── Feature data ──────────────────────────────────────────────────────────────
-const features: { Icon: LucideIcon; title: string; description: string }[] = [
+const features: { icon: LucideIcon; title: string; description: string }[] = [
   {
-    Icon: Search,
-    title: "Cliente pesquisa, não encontra",
+    icon: Search,
+    title: "O cliente te encontra, mas escolhe o concorrente",
     description:
-      "Sem site, sua empresa não aparece no Google quando alguém busca pelo que você oferece na sua cidade.",
+      "Quando alguém compara dois negócios online, o que tem presença mais profissional e comunicação mais clara leva o contato. Independente de quem é melhor.",
   },
   {
-    Icon: Users,
-    title: "Instagram não é cartão de visitas",
+    icon: Users,
+    title: "Rede social não substitui presença profissional",
     description:
-      "Rede social é ferramenta de alcance, não de credibilidade. Um site transmite confiança que o perfil não consegue.",
+      "Instagram gera alcance. Site gera credibilidade. O cliente que está prestes a fechar negócio pesquisa você antes de ligar.",
   },
   {
-    Icon: ShieldCheck,
-    title: "Credibilidade se constrói visualmente",
+    icon: ShieldCheck,
+    title: "Comunicação clara vende antes de você falar",
     description:
-      "Um site bem-feito muda a percepção do cliente antes mesmo de você falar com ele — e vende antes de você abrir a boca.",
+      "Quando seu site explica com clareza o que você oferece e por que escolher você, o cliente chega pronto para comprar.",
   },
 ];
 
@@ -115,7 +115,7 @@ export default function FeatureShaderCards() {
     <section className="bg-background-soft border-y border-border py-20 px-6">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-          {features.map(({ Icon, title, description }, i) => {
+          {features.map(({ icon: Icon, title, description }, i) => {
             const theme = cardThemes[i];
             return (
               <div
